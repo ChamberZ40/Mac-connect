@@ -16,8 +16,6 @@ import (
 	"github.com/chenhg5/cc-connect/agent/claudecode"
 	"github.com/chenhg5/cc-connect/agent/codex"
 	"github.com/chenhg5/cc-connect/agent/cursor"
-	"github.com/chenhg5/cc-connect/agent/gemini"
-	"github.com/chenhg5/cc-connect/agent/opencode"
 	"github.com/chenhg5/cc-connect/core"
 )
 
@@ -59,8 +57,6 @@ func skipUnlessAgentReady(t *testing.T, agentType string) {
 var _ = claudecode.New
 var _ = codex.New
 var _ = cursor.New
-var _ = gemini.New
-var _ = opencode.New
 
 // mockPlatform records all messages sent through it for test verification.
 type mockPlatform struct {

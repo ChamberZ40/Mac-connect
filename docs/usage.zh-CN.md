@@ -100,21 +100,12 @@ reset_on_idle_mins = 60
 | 规划模式 | `plan` | 只读分析 |
 | 问答模式 | `ask` | 问答风格，只读 |
 
-### Gemini CLI 模式
+### GitHub Copilot CLI 模式
 
 | 模式 | 配置值 | 行为 |
 |------|--------|------|
-| 默认 | `default` | 每次需确认 |
-| 自动编辑 | `auto_edit` / `edit` | 编辑自动通过 |
-| 全自动 | `yolo` | 自动批准所有 |
-| 规划模式 | `plan` | 只读规划 |
-
-### Qoder CLI / OpenCode / iFlow CLI
-
-| 模式 | 配置值 | 行为 |
-|------|--------|------|
-| 默认 | `default` | 标准权限 |
-| YOLO | `yolo` | 跳过所有检查 |
+| 默认 | `default` | 每次工具调用都需确认 |
+| YOLO | `bypassPermissions` / `yolo` | 全部自动通过 |
 
 ### 配置示例
 
@@ -206,9 +197,8 @@ cc-connect provider import --project my-backend  # 从 cc-switch 导入
 |-------|-----------|------------|
 | Claude Code | `ANTHROPIC_API_KEY` | `ANTHROPIC_BASE_URL` |
 | Codex | `OPENAI_API_KEY` | `OPENAI_BASE_URL` |
-| Gemini CLI | `GEMINI_API_KEY` | 使用 `env` 字段 |
-| OpenCode | `ANTHROPIC_API_KEY` | 使用 `env` 字段 |
-| iFlow CLI | `IFLOW_API_KEY` | `IFLOW_BASE_URL` |
+| Cursor Agent | `CURSOR_API_KEY` | 使用 `env` 字段 |
+| GitHub Copilot CLI | —（走 `copilot` 登录态） | 使用 `env` 字段 |
 
 ---
 
@@ -575,7 +565,7 @@ cc-connect 启动 Claude Code 子进程时会在环境中设置 `CC_CONNECT_PERM
 
 发送语音消息，自动转文字。
 
-**支持平台：** 飞书、企业微信、Telegram、LINE、Discord、Slack
+**支持平台：** 飞书、企业微信、微信
 
 **前置条件：** OpenAI/Groq API Key，`ffmpeg`
 
@@ -611,7 +601,7 @@ brew install ffmpeg
 
 将 AI 回复合成语音发送。
 
-**支持平台：** 实现音频发送的平台，例如飞书/Lark、钉钉、Telegram、Max、微信。
+**支持平台：** 实现音频发送的平台，例如飞书/Lark 与微信。
 
 ### 配置
 
@@ -655,7 +645,6 @@ speed = 0.96
 
 **当前支持平台：**
 - 飞书
-- Telegram
 
 ### 什么时候需要先执行 setup
 
@@ -843,14 +832,14 @@ Shell 配置适用于 cc-connect 中所有命令执行路径：
 ```
 /bind              查看绑定
 /bind claudecode   添加 claudecode 项目
-/bind gemini       添加 gemini 项目
+/bind codex        添加 codex 项目
 /bind -claudecode  移除 claudecode
 ```
 
 ### 机器人间通信
 
 ```bash
-cc-connect relay send --to gemini "你觉得这个架构怎么样？"
+cc-connect relay send --to codex "你觉得这个架构怎么样？"
 ```
 
 ---
@@ -1054,7 +1043,7 @@ WebSocket 支持双向通信 —— 向 Agent 发送消息，并实时接收 Age
 name = "my-project"
 
 [projects.agent]
-type = "claudecode"  # 或 codex, cursor, gemini, qoder, opencode, iflow
+type = "claudecode"  # 或 codex, cursor, copilot, acp
 
 [projects.agent.options]
 work_dir = "/path/to/project"
@@ -1062,7 +1051,7 @@ mode = "default"
 provider = "anthropic"
 
 [[projects.platforms]]
-type = "feishu"  # 或 wps-xiezuo, dingtalk, telegram, slack, discord, wecom, weixin, line, qq, qqbot
+type = "feishu"  # 或 wecom, weixin
 
 [projects.platforms.options]
 # 平台特定配置
@@ -1149,26 +1138,4 @@ chat_id = "your_group_chat_id@chatroom"   # 群聊 ID 以 @chatroom 结尾
 
 更多关于 `weixin` 平台的内容见 [docs/weixin.md](./weixin.md)。
 
-### Telegram 代理 / 出站限制 (issue #245)
 
-Telegram 平台在 `[projects.platforms.options]` 里直接支持 HTTP 和
-SOCKS5 正向代理。不需要配系统级代理或 sidecar，per Telegram 实例
-设置即可。
-
-```toml
-[[projects.platforms]]
-type = "telegram"
-
-[projects.platforms.options]
-token = "${TELEGRAM_BOT_TOKEN}"
-proxy = "http://127.0.0.1:7890"     # 或 socks5://127.0.0.1:1080
-proxy_username = ""                  # 代理无鉴权时留空
-proxy_password = ""
-```
-
-`proxy` 同时接受 `http://` 和 `socks5://` 两种 URL，鉴权可选。
-代理只作用于该 Telegram 实例的 Bot API 请求，不会影响其他平台或
-管理后台的出站。
-
-完整说明见 [docs/telegram.md](./telegram.md#21-optional-use-a-proxy)（英文原文，
-`docs/telegram.md` 目前只有英文版）。该配置由 PR #389 引入。

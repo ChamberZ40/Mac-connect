@@ -502,9 +502,6 @@ enable_feishu_card = false
 
 ## 下一步
 
-- [接入钉钉](./dingtalk.md)
-- [接入微博](./weibo.md)
-- [接入 Telegram](./telegram.md)
-- [接入 Slack](./slack.md)
-- [接入 Discord](./discord.md)
+- [接入企业微信](./wecom.md)
+- [接入微信（个人 ilink）](./weixin.md)
 - [返回首页](../README.md)

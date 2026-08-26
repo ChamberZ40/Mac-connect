@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-CC-Connect is a bridge that connects AI coding agents (Claude Code, Codex, Gemini CLI, Cursor, etc.) with messaging platforms (Feishu/Lark, Telegram, Discord, Slack, DingTalk, WeChat Work, QQ, LINE). Users interact with their coding agent through their preferred messaging app.
+CC-Connect is a bridge that connects AI coding agents (Claude Code, Codex, Cursor, GitHub Copilot, any ACP-speaking agent) with messaging platforms (Feishu/Lark, WeChat Work, WeChat). Users interact with their coding agent through their preferred messaging app.
 
 ## Architecture
 
@@ -17,16 +17,10 @@ CC-Connect is a bridge that connects AI coding agents (Claude Code, Codex, Gemin
 ├──────────────────────┬──────────────────────────┤
 │     agent/           │      platform/           │
 │  ├── claudecode/     │  ├── feishu/             │
-│  ├── codex/          │  ├── telegram/           │
-│  ├── cursor/         │  ├── discord/            │
-│  ├── gemini/         │  ├── slack/              │
-│  ├── iflow/          │  ├── dingtalk/           │
-│  ├── opencode/       │  ├── wecom/              │
-│  ├── acp/            │  ├── qq/                 │
-│  └── qoder/          │  ├── qqbot/              │
-│                      │  ├── line/               │
-│                      │  ├── weibo/              │
-│                      │  └── cloud-web/          │
+│  ├── codex/          │  ├── wecom/              │
+│  ├── cursor/         │  └── weixin/             │
+│  ├── copilot/        │                          │
+│  └── acp/            │                          │
 ├──────────────────────┴──────────────────────────┤
 │                     daemon/                     │  ← systemd/launchd service
 └─────────────────────────────────────────────────┘
@@ -221,30 +215,28 @@ platforms are compiled in.
 ### Include only specific agents/platforms
 
 ```bash
-# Only Claude Code agent + Feishu and Telegram platforms
-make build AGENTS=claudecode PLATFORMS_INCLUDE=feishu,telegram
+# Only Claude Code agent + Feishu platform
+make build AGENTS=claudecode PLATFORMS_INCLUDE=feishu
 
 # Multiple agents
-make build AGENTS=claudecode,codex PLATFORMS_INCLUDE=feishu,telegram,discord
+make build AGENTS=claudecode,codex PLATFORMS_INCLUDE=feishu,wecom
 ```
 
 ### Exclude specific agents/platforms
 
 ```bash
 # Exclude some platforms you don't need
-make build EXCLUDE=discord,dingtalk,qq,qqbot,line
+make build EXCLUDE=weixin,wecom
 ```
 
 ### Direct build tag usage (without Make)
 
 ```bash
-go build -tags 'no_discord no_dingtalk no_qq no_qqbot no_line' ./cmd/cc-connect
+go build -tags 'no_weixin no_wecom' ./cmd/cc-connect
 ```
 
-Available tags: `no_acp`, `no_claudecode`, `no_codex`, `no_copilot`, `no_cursor`, `no_gemini`,
-`no_iflow`, `no_opencode`, `no_qoder`, `no_feishu`, `no_telegram`,
-`no_discord`, `no_slack`, `no_dingtalk`, `no_wecom`, `no_weixin`, `no_qq`, `no_qqbot`,
-`no_line`, `no_weibo`, `no_tuitui`.
+Available tags: `no_acp`, `no_claudecode`, `no_codex`, `no_copilot`, `no_cursor`,
+`no_feishu`, `no_wecom`, `no_weixin`.
 
 ## Pre-Commit Checklist
 

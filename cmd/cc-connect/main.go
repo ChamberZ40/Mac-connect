@@ -223,21 +223,12 @@ var topLevelCommandHandlers = map[string]func([]string){
 	"agent-sid": runAgentSID,
 	"daemon":    runDaemon,
 	"feishu":    runFeishu,
-	"tuitui":    runTuiTui,
 	"weixin":    runWeixin,
-	"yuanbao":   runYuanbao,
 	"doctor":    runDoctor,
 	"web":       runWeb,
 }
 
 func main() {
-	// Agy hooks require stdout to contain only the final JSON decision. Handle
-	// this internal command before update checks, logging, or normal CLI setup.
-	if len(os.Args) > 1 && os.Args[1] == "_agy-permission-hook" {
-		runAntigravityPermissionHook()
-		return
-	}
-
 	checkUpdateAsync()
 	// When started as a daemon (CC_LOG_FILE set), redirect logs to a rotating file.
 	// Log file setup happens before flag.Parse() so the rotating writer is in
@@ -562,6 +553,8 @@ func main() {
 				ToolMessages:     tool,
 				HistoryMaxLen:    &historyMaxLen,
 				HideAgentFooter:  hideAgentFooter,
+
+				PromoteAgentFooter: config.EffectivePromoteAgentFooter(cfg, &proj),
 			})
 		}
 
@@ -1664,10 +1657,6 @@ Commands:
     new              Force QR onboarding to create a new bot
     bind             Bind existing app_id/app_secret
 
-  tuitui             Access TuiTui history, posts, and attachments
-    messages         Read chat history
-    search           Search chat history
-    post             Post a channel message
     download         Download a message attachment
 
   weixin             Setup Weixin personal (ilink) via QR or token
@@ -1693,7 +1682,6 @@ Examples:
   cc-connect cron list                List all scheduled tasks
   cc-connect feishu setup             Setup Feishu/Lark bot credentials
   cc-connect weixin setup             Setup Weixin (ilink) with QR or --token
-  cc-connect yuanbao setup            Setup Yuanbao bot with --token app_key:app_secret
   cc-connect update                   Update to the latest version
   cc-connect config format            Format the config file
   cc-connect config example > c.toml  Save example config to a file
@@ -1760,6 +1748,8 @@ func reloadConfig(configPath, projName string, engine *core.Engine) (*core.Confi
 		ToolMessages:     tool,
 		HistoryMaxLen:    &historyMaxLen,
 		HideAgentFooter:  hideAgentFooter,
+
+		PromoteAgentFooter: config.EffectivePromoteAgentFooter(cfg, proj),
 	})
 	result.DisplayUpdated = true
 

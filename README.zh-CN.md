@@ -216,17 +216,15 @@
 | ⚠️ | 部分支持、需额外配置（如语音/STT）或受厂商接口 / 应用类型限制 |
 | ❌ | 不支持或实际不可用 |
 
-† **QQ（NapCat / OneBot）** — 非官方自建桥接，体验依赖你的 NapCat 与网络环境。
-
-| 能力 | 飞书 | WPS 协作 | 钉钉 | Telegram | Slack | Discord | LINE | 企业微信 | 微博 | **微信个人号**<br>（ilink） | QQ† | QQ 官方机器人 | Matrix |
-|------|:----:|:--------:|:----:|:--------:|:-----:|:-------:|:----:|:--------:|:----:|:--------------------------:|:---:|:------------:|:-----:|
-| 文本与斜杠命令 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Markdown / 卡片 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ✅ | ⚠️ |
-| 流式 / 分片回复 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 图片与文件 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| 语音 / STT / TTS | ⚠️ | ❌ | ⚠️ | ✅ | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ✅ | ⚠️ | ⚠️ | ❌ |
-| 私聊 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 群聊 / 频道 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| 能力 | 飞书 | 企业微信 | **微信个人号**<br>（ilink） |
+|------|:----:|:--------:|:--------------------------:|
+| 文本与斜杠命令 | ✅ | ✅ | ✅ |
+| Markdown / 卡片 | ✅ | ⚠️ | ✅ |
+| 流式 / 分片回复 | ✅ | ✅ | ✅ |
+| 图片与文件 | ✅ | ✅ | ✅ |
+| 语音 / STT / TTS | ⚠️ | ⚠️ | ✅ |
+| 私聊 | ✅ | ✅ | ✅ |
+| 群聊 / 频道 | ✅ | ✅ | ✅ |
 
 > **企业微信：** Webhook 模式需要**公网 URL**；长连接等模式多数**不需要**。  
 > **语音行：** 多数平台要在 `config.toml` 里配置 `[speech]` / TTS 等，表中为经验性归纳。  
@@ -236,13 +234,13 @@
 ## ✨ 为什么选择 cc-connect？
 
 ### 🤖 通用 Agent 支持
-**10+ 大 AI Agent** — Claude Code、Codex、Cursor Agent、Kimi CLI、Qoder CLI、Gemini CLI、OpenCode、iFlow CLI、Pi、Devin、Copilot，还可通过 [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/agents) 接入更多 Agent。按需选用，或同时使用全部。
+**5 大 AI Agent** — Claude Code、Codex、Cursor Agent、GitHub Copilot CLI，还可通过 [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/agents) 接入 OpenClaw 等更多 Agent。按需选用，或同时使用全部。
 
 ### 📱 平台灵活性
-**13 大聊天平台** — 飞书、WPS 协作、钉钉、Slack、Telegram、Discord、企业微信、微博、LINE、QQ、QQ 官方机器人、Matrix，以及 **微信个人号（ilink）**。大部分平台**无需公网 IP**。
+**3 大聊天平台** — 飞书 (Lark)、企业微信，以及 **微信个人号（ilink）**。三者均**无需公网 IP**。
 
 ### 🔄 多 Agent 编排
-**多机器人中继** — 在群聊中绑定多个机器人，让它们相互协作。问 Claude，再听 Gemini 的见解 — 同一个对话搞定。
+**多机器人中继** — 在群聊中绑定多个机器人，让它们相互协作。问 Claude，再听 Codex 的见解 — 同一个对话搞定。
 
 ### 🎮 完整的聊天控制
 **聊天即控制** — 切换模型 (`/model`)、切换推理强度 (`/reasoning`)、切换权限模式 (`/mode`)、管理会话，全部通过斜杠命令完成。
@@ -266,12 +264,11 @@
 
 
 <p align="center">
-  <img src="docs/images/screenshot/cc-connect-lark.JPG" alt="飞书" width="32%" />
-  <img src="docs/images/screenshot/cc-connect-telegram.JPG" alt="Telegram" width="32%" />
-  <img src="docs/images/screenshot/cc-connect-wechat.JPG" alt="微信" width="32%" />
+  <img src="docs/images/screenshot/cc-connect-lark.JPG" alt="飞书" width="45%" />
+  <img src="docs/images/screenshot/cc-connect-wechat.JPG" alt="微信" width="45%" />
 </p>
 <p align="center">
-  <em>左：飞书 &nbsp;|&nbsp; Telegram &nbsp;|&nbsp; 右：微信</em>
+  <em>左：飞书 &nbsp;|&nbsp; 右：微信</em>
 </p>
 
 
@@ -292,24 +289,17 @@ npm install -g @anthropic-ai/claude-code   # 任意平台通过 npm
 # OpenAI Codex
 npm install -g @openai/codex
 
-# Google Gemini CLI
-npm install -g @google/gemini-cli
-
-# iFlow CLI
-npm install -g @iflow-ai/iflow-cli
-
-# Qoder CLI
-curl -fsSL https://qoder.com/install | bash
+# GitHub Copilot CLI
+npm install -g @github/copilot
 ```
 
-**Cursor Agent** 和 **OpenCode** 请参考各自的官方安装文档：
+**Cursor Agent** 请参考官方安装文档；其他任何支持 ACP 的 Agent（如 OpenClaw）都可以通过 `type = "acp"` 接入：
 - Cursor Agent: <https://docs.cursor.com/agent>
-- OpenCode: <https://github.com/opencode-ai/opencode>
 
 确认可执行文件在 `PATH` 中：
 
 ```bash
-claude --version       # 或 codex / gemini / opencode / qodercli / cursor-agent ...
+claude --version       # 或 codex / copilot / cursor-agent ...
 ```
 
 ### 2️⃣ 完成 Agent 登录认证
@@ -319,7 +309,7 @@ claude --version       # 或 codex / gemini / opencode / qodercli / cursor-agent
 ```bash
 claude login           # 会在浏览器里打开授权页面
 # 或
-codex login            # / gemini / opencode 等也类似，请参考各自文档
+codex login            # copilot / cursor-agent 等也类似，请参考各自文档
 ```
 
 跳过这一步的话，cc-connect 仍能启动，但 Agent 会因为未认证拒绝所有请求。
@@ -354,7 +344,7 @@ Web admin:  http://localhost:9820
 
 ### 5️⃣ 在 Web UI 里配置平台 Bot Token
 
-在 Web UI 里新建一个项目，然后添加至少一个平台（飞书 / Telegram / Discord / Slack / 钉钉 / 企业微信 / QQ / LINE / 微信 ilink），把该平台开发者后台的 Bot Token 粘贴进去。保存后 cc-connect 会热加载。
+在 Web UI 里新建一个项目，然后添加至少一个平台（飞书 / 企业微信 / 微信 ilink），把该平台开发者后台的凭证粘贴进去。保存后 cc-connect 会热加载。
 
 至此完成 — 给你的 Bot 发条消息，cc-connect 就会把它转给本地的 Agent。
 
@@ -449,30 +439,11 @@ cc-connect update --pre     # 含预发布版本
 | Agent | Claude Code | ✅ 已支持 |
 | Agent | Codex (OpenAI) | ✅ 已支持 |
 | Agent | Cursor Agent | ✅ 已支持 |
-| Agent | Gemini CLI (Google) | ✅ 已支持 |
-| Agent | Qoder CLI | ✅ 已支持 |
-| Agent | OpenCode (Crush) | ✅ 已支持 |
-| Agent | iFlow CLI | ✅ 已支持 |
-| Agent | Kimi CLI (Moonshot) | ✅ 已支持 |
-| Agent | Pi (Cursor Background Agent) | ✅ 已支持 |
 | Agent | Copilot (GitHub) | ✅ 已支持 |
-| Agent | ACP (Agent Client Protocol) | ✅ 支持任何 [ACP 兼容 Agent](https://agentclientprotocol.com/get-started/agents) |
-| Agent | Devin (Cognition) | ✅ 已支持（通过 ACP）|
-| Agent | Goose (Block) | 🔜 计划中 |
-| Agent | Aider | 🔜 计划中 |
+| Agent | ACP (Agent Client Protocol) | ✅ 支持任何 [ACP 兼容 Agent](https://agentclientprotocol.com/get-started/agents)，如 OpenClaw |
 | Platform | 飞书 (Lark) | ✅ WebSocket — 无需公网 IP |
-| Platform | 钉钉 | ✅ Stream — 无需公网 IP |
-| Platform | WPS 协作 | ✅ WebSocket — 无需公网 IP |
-| Platform | Telegram | ✅ Long Polling — 无需公网 IP |
-| Platform | Slack | ✅ Socket Mode — 无需公网 IP |
-| Platform | Discord | ✅ Gateway — 无需公网 IP |
-| Platform | 微博 | ✅ WebSocket — 无需公网 IP |
-| Platform | LINE | ✅ Webhook — 需要公网 URL |
 | Platform | 企业微信 | ✅ WebSocket / Webhook |
-| Platform | 微信个人号（ilink） | ✅— HTTP 长轮询 — 无需公网 IP |
-| Platform | QQ (NapCat/OneBot) | ✅ WebSocket |
-| Platform | QQ 官方机器人 | ✅ WebSocket — 无需公网 IP |
-| Platform | Matrix | ✅ Long Polling (/sync) — 无需公网 IP |
+| Platform | 微信个人号（ilink） | ✅ HTTP 长轮询 — 无需公网 IP |
 
 
 ## 📖 平台接入指南
@@ -480,16 +451,8 @@ cc-connect update --pre     # 含预发布版本
 | 平台 | 指南 | 连接方式 | 需要公网 IP? |
 |------|------|---------|-------------|
 | 飞书 (Lark) | [docs/feishu.md](docs/feishu.md) | WebSocket | 不需要 |
-| 钉钉 | [docs/dingtalk.md](docs/dingtalk.md) | Stream | 不需要 |
-| WPS 协作 | [docs/wps-xiezuo.md](docs/wps-xiezuo.md) | WebSocket | 不需要 |
-| Telegram | [docs/telegram.md](docs/telegram.md) | Long Polling | 不需要 |
-| Slack | [docs/slack.md](docs/slack.md) | Socket Mode | 不需要 |
-| Discord | [docs/discord.md](docs/discord.md) | Gateway | 不需要 |
-| 微博 | [docs/weibo.md](docs/weibo.md) | WebSocket | 不需要 |
 | 企业微信 | [docs/wecom.md](docs/wecom.md) | WebSocket / Webhook | 不需要 (WS) / 需要 (Webhook) |
 | 微信个人号（ilink） | [docs/weixin.md](docs/weixin.md) | HTTP 长轮询（ilink） | 不需要 |
-| QQ / QQ 机器人 | [docs/qq.md](docs/qq.md) | WebSocket | 不需要 |
-| Matrix | [docs/matrix.md](docs/matrix.md) | /sync（长轮询） | 不需要 |
 
 
 ## 🎯 核心功能
@@ -585,7 +548,6 @@ cc-connect doctor user-isolation
 
 首版支持：
 - 飞书
-- Telegram
 
 如果当前 Agent 不是原生注入 system prompt 的类型，升级后请先在聊天里执行一次：
 

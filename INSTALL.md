@@ -1,16 +1,16 @@
 # cc-connect Installation & Configuration Guide
 
-> **This document is designed to be read by AI coding agents (Claude Code, Cursor, Gemini CLI, etc.) to help users install and configure cc-connect.** You can feed this file directly to your AI agent.
+> **This document is designed to be read by AI coding agents (Claude Code, Cursor, Codex, etc.) to help users install and configure cc-connect.** You can feed this file directly to your AI agent.
 
 ## What is cc-connect?
 
-cc-connect bridges local AI coding assistants to messaging platforms (Feishu, DingTalk, Telegram, Slack, Discord, LINE, WeChat Work, QQ, **personal WeChat** via the **Weixin (ilink)** platform).
+cc-connect bridges local AI coding assistants to messaging platforms (Feishu/Lark, WeChat Work, **personal WeChat** via the **Weixin (ilink)** platform).
 
 GitHub: https://github.com/chenhg5/cc-connect
 
 **IMPORTANT: If you are an AI agent helping a user install cc-connect, use interactive tools (like AskUserQuestion) to guide them through configuration choices:**
-- Agent selection (Claude Code, Cursor, Gemini, etc.)
-- Platform selection (Feishu, Telegram, Discord, etc.)
+- Agent selection (Claude Code, Codex, Cursor, Copilot, ACP)
+- Platform selection (Feishu, WeChat Work, Weixin)
 - API keys and authentication tokens
 - Project paths and preferences
 
@@ -78,29 +78,22 @@ npm install -g @anthropic-ai/claude-code
 # Codex
 npm install -g @openai/codex
 
-# Gemini CLI
-npm install -g @google/gemini-cli
-
-# iFlow CLI
-npm install -g @iflow-ai/iflow-cli
-
-# Qoder CLI
-curl -fsSL https://qoder.com/install | bash
+# GitHub Copilot CLI
+npm install -g @github/copilot
 ```
 
-For **Cursor Agent** and **OpenCode**, follow their official install docs:
+For **Cursor Agent**, follow the official install docs:
 - Cursor Agent: https://docs.cursor.com/agent
-- OpenCode: https://github.com/opencode-ai/opencode
+
+Any other agent that speaks ACP (e.g. OpenClaw) is configured with `type = "acp"`.
 
 Verify your selected agent works:
 
 ```bash
 claude --version
 codex --version
-gemini --version
-iflow --version
-opencode --version
-qodercli --version
+copilot --version
+cursor-agent --version
 ```
 
 ## Step 3: Create config.toml
@@ -143,7 +136,7 @@ level = "info"  # debug, info, warn, error
 name = "my-project"
 
 [projects.agent]
-type = "claudecode"  # or "codex", "cursor", "gemini", "qoder", "opencode", "iflow"
+type = "claudecode"  # or "codex", "cursor", "copilot", "acp"
 
 [projects.agent.options]
 work_dir = "/absolute/path/to/your/project"
@@ -157,13 +150,11 @@ mode = "default"
 # "suggest" (default), "auto-edit", "full-auto", "yolo"
 # model = "o3"  # optional: specify model
 
-# --- Qoder CLI mode options ---
-# "default", "yolo"
-# model = "auto"  # "auto", "ultimate", "performance", "efficient", "lite"
+# --- Cursor Agent mode options ---
+# "default", "force"
 
-# --- iFlow CLI mode options ---
-# "default", "auto-edit", "plan", "yolo"
-# model = "Qwen3-Coder"  # optional: specify model
+# --- GitHub Copilot CLI mode options ---
+# "default", "bypassPermissions"
 
 # Add one or more platform sections below
 ```
@@ -223,130 +214,6 @@ app_secret = "xxxxxxxxxxxxxxxxxxxxxxxx"
 
 ---
 
-### DingTalk — No public IP needed
-
-Connection: Stream mode (WebSocket)
-
-**Setup steps:**
-1. Go to https://open-dev.dingtalk.com → Create App
-2. Enable **Bot** capability, select **Stream mode**
-3. Configure permissions for messaging
-4. Copy Client ID (AppKey) and Client Secret (AppSecret)
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "dingtalk"
-
-[projects.platforms.options]
-client_id = "dingxxxxxxxxxxxxxxxxx"
-client_secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-**Detailed guide:** [docs/dingtalk.md](docs/dingtalk.md)
-
----
-
-### Telegram — No public IP needed
-
-Connection: Long Polling
-
-**Setup steps:**
-1. Message @BotFather on Telegram → send `/newbot`
-2. Follow prompts to set bot name and username (must end with `bot`)
-3. Copy the bot token
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "telegram"
-
-[projects.platforms.options]
-token = "1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
-```
-
-**Detailed guide:** [docs/telegram.md](docs/telegram.md)
-
----
-
-### Slack — No public IP needed
-
-Connection: Socket Mode (WebSocket)
-
-**Setup steps:**
-1. Go to https://api.slack.com/apps → Create New App → From scratch
-2. Enable **Socket Mode** (Settings → Socket Mode) → generate App-Level Token (`xapp-...`)
-3. Subscribe to bot events: `message.im`, `app_mention` (Event Subscriptions)
-4. Add Bot Token Scopes: `chat:write`, `im:history`, `im:read`, `im:write`, `app_mentions:read`
-5. Install App to Workspace → copy Bot Token (`xoxb-...`)
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "slack"
-
-[projects.platforms.options]
-bot_token = "xoxb-your-bot-token"
-app_token = "xapp-your-app-level-token"
-```
-
-**Detailed guide:** [docs/slack.md](docs/slack.md)
-
----
-
-### Discord — No public IP needed
-
-Connection: Gateway WebSocket
-
-**Setup steps:**
-1. Go to https://discord.com/developers/applications → New Application
-2. Go to **Bot** → Add Bot → copy Token
-3. Enable **Message Content Intent** (under Privileged Gateway Intents)
-4. Go to **OAuth2** → URL Generator → select scope `bot` → select permissions `Send Messages`, `Read Message History`
-5. Open the generated URL to invite bot to your server
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "discord"
-
-[projects.platforms.options]
-token = "your-discord-bot-token"
-```
-
-**Detailed guide:** [docs/discord.md](docs/discord.md)
-
----
-
-### LINE — Requires public URL
-
-Connection: HTTP Webhook (you need ngrok, cloudflared, or a server with public IP)
-
-**Setup steps:**
-1. Go to https://developers.line.biz/console/ → Create Messaging API channel
-2. Copy Channel Secret and Channel Access Token (long-lived)
-3. Set webhook URL in LINE console: `https://<your-public-domain>:<port>/callback`
-4. Expose local port using ngrok/cloudflared: `ngrok http 8080` or `cloudflared tunnel --url http://localhost:8080`
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "line"
-
-[projects.platforms.options]
-channel_secret = "your-channel-secret"
-channel_token = "your-channel-access-token"
-port = "8080"
-callback_path = "/callback"
-```
-
----
-
 ### WeChat Work (企业微信) — Requires public URL
 
 Connection: HTTP Webhook (you need ngrok, cloudflared, or a server with public IP)
@@ -401,63 +268,6 @@ Personal WeChat uses Tencent’s **ilink bot HTTP API** (same family as OpenClaw
 If you already have a Bearer token, use `cc-connect weixin bind --project my-project --token '<token>'`.
 
 **Detailed guide (Chinese):** [docs/weixin.md](docs/weixin.md)
-
-### QQ (via NapCat / OneBot v11) — No public IP needed
-
-QQ integration requires a third-party OneBot v11 implementation (e.g., NapCat) as a bridge.
-
-1. Deploy NapCat (recommended via Docker):
-   ```bash
-   docker run -d --name napcat -e ACCOUNT=<QQ号> -p 3001:3001 -p 6099:6099 --restart unless-stopped mlikiowa/napcat-docker:latest
-   ```
-2. First launch: check `docker logs -f napcat` for a QR code, scan with QQ mobile app to log in
-3. Open NapCat WebUI at `http://localhost:6099`, enable **Forward WebSocket** on port 3001
-4. Add to `config.toml`:
-
-```toml
-[[projects.platforms]]
-type = "qq"
-
-[projects.platforms.options]
-ws_url = "ws://127.0.0.1:3001"  # NapCat Forward WebSocket URL
-token = ""                       # optional: access_token (must match NapCat config)
-allow_from = "*"                 # allowed QQ user IDs: "12345,67890" or "*" for all
-```
-
-**Detailed guide:** [docs/qq.md](docs/qq.md)
-
----
-
-### Matrix — No public IP needed
-
-Connection: Long Polling via /sync
-
-**Setup steps:**
-1. Create an account on a Matrix homeserver (e.g. [matrix.org](https://matrix.org), or your own self-hosted server)
-2. Get an access token:
-   - Open **Element** (or your preferred Matrix client)
-   - Go to **Settings** → **Help & About** → **Advanced** → click **Access Token**
-   - Copy the token (it starts with `syt_` on most servers)
-3. (Optional) Note your user ID (e.g. `@bot:matrix.org`)
-
-**Config:**
-
-```toml
-[[projects.platforms]]
-type = "matrix"
-
-[projects.platforms.options]
-homeserver = "https://matrix.org"
-access_token = "syt_xxx_xxx"
-# user_id = "@bot:matrix.org"           # optional, auto-detected
-# allow_from = "*"
-# auto_join = true                       # default true
-# share_session_in_channel = false
-# group_reply_all = false
-# proxy = ""
-```
-
-**Detailed guide:** [docs/matrix.md](docs/matrix.md)
 
 ---
 
@@ -531,16 +341,14 @@ cc-connect supports scheduled tasks (cron jobs). You can always create them via 
 
 **Claude Code** handles this automatically via `--append-system-prompt` — no extra setup needed.
 
-**For Codex, Cursor Agent, Qoder CLI, Gemini CLI, OpenCode, or iFlow CLI**, add the following instructions to the agent's project-level instruction file in your project's `work_dir`:
+**For Codex, Cursor Agent, GitHub Copilot CLI, or an ACP agent**, add the following instructions to the agent's project-level instruction file in your project's `work_dir`:
 
 | Agent | File to create/edit |
 |-------|-------------------|
 | Codex | `AGENTS.md` |
 | Cursor Agent | `.cursorrules` |
-| Qoder CLI | `AGENTS.md` |
-| Gemini CLI | `GEMINI.md` |
-| OpenCode | `OPENCODE.md` |
-| iFlow CLI | `IFLOW.md` |
+| GitHub Copilot CLI | `AGENTS.md` |
+| ACP agent (e.g. OpenClaw) | `AGENTS.md` |
 
 **Content to add** (copy-paste into the file):
 
@@ -593,7 +401,7 @@ For short single-line messages:
 
 After adding this file, the agent will be able to translate natural language scheduling requests into `cc-connect cron add` commands automatically.
 
-> **Tip:** You may want to add `AGENTS.md` / `.cursorrules` / `GEMINI.md` to your `.gitignore` if you don't want cc-connect instructions committed to version control.
+> **Tip:** You may want to add `AGENTS.md` / `.cursorrules` to your `.gitignore` if you don't want cc-connect instructions committed to version control.
 
 ## Multi-Project Setup
 
@@ -629,10 +437,12 @@ work_dir = "/path/to/frontend"
 mode = "full-auto"
 
 [[projects.platforms]]
-type = "telegram"
+type = "wecom"
 
 [projects.platforms.options]
-token = "xxx"
+corp_id = "wwxxxxxxxxxxxxxxxxx"
+corp_secret = "your-app-secret"
+agent_id = "1000002"
 
 # Third project — using Cursor Agent
 [[projects]]
@@ -646,65 +456,11 @@ work_dir = "/path/to/design-system"
 mode = "force"
 
 [[projects.platforms]]
-type = "discord"
+type = "weixin"
 
 [projects.platforms.options]
-token = "xxx"
+token = "your-ilink-bearer-token"
 
-# Fourth project — using Gemini CLI
-[[projects]]
-name = "my-gemini-project"
-
-[projects.agent]
-type = "gemini"
-
-[projects.agent.options]
-work_dir = "/path/to/gemini-project"
-mode = "yolo"    # "default" | "auto_edit" | "yolo" | "plan"
-
-[[projects.platforms]]
-type = "slack"
-
-[projects.platforms.options]
-bot_token = "xoxb-xxx"
-app_token = "xapp-xxx"
-
-# Fifth project — using Qoder CLI
-[[projects]]
-name = "my-qoder-project"
-
-[projects.agent]
-type = "qoder"
-
-[projects.agent.options]
-work_dir = "/path/to/qoder-project"
-mode = "default"    # "default" | "yolo"
-# model = "auto"    # "auto" | "ultimate" | "performance" | "efficient" | "lite"
-
-[[projects.platforms]]
-type = "telegram"
-
-[projects.platforms.options]
-token = "xxx"
-
-# Sixth project — using iFlow CLI
-[[projects]]
-name = "my-iflow-project"
-
-[projects.agent]
-type = "iflow"
-
-[projects.agent.options]
-work_dir = "/path/to/iflow-project"
-mode = "default"    # "default" | "auto-edit" | "plan" | "yolo"
-# model = "Qwen3-Coder"
-
-[[projects.platforms]]
-type = "slack"
-
-[projects.platforms.options]
-bot_token = "xoxb-xxx"
-app_token = "xapp-xxx"
 ```
 
 ## Upgrade
@@ -816,10 +572,8 @@ The following additional features are available:
 
 - **Codex Agent**: OpenAI Codex CLI integration (`codex exec --json`)
 - **Cursor Agent**: Cursor Agent CLI integration (`agent --print --output-format stream-json`)
-- **Gemini CLI**: Google Gemini CLI integration (`gemini -p --output-format stream-json`)
-- **Qoder CLI**: Qoder CLI integration (`qodercli -p -f stream-json`)
-- **OpenCode**: OpenCode CLI integration (`opencode run --format json`)
-- **iFlow CLI**: iFlow CLI integration (`iflow -i -r -o`)
+- **GitHub Copilot CLI**: Copilot CLI integration (`copilot`)
+- **ACP Agents**: any agent speaking the [Agent Client Protocol](https://agentclientprotocol.com/) over stdio, e.g. OpenClaw
 - **Voice Messages (STT)**: Speech-to-text via Whisper API (OpenAI / Groq / SiliconFlow). Requires `ffmpeg` and `[speech]` config.
 - **Voice Reply (TTS)**: Text-to-speech via Qwen / OpenAI / MiniMax / MiMo / local providers. Requires `ffmpeg` and `[tts]` config.
 - **Image Messages**: Send images to Claude Code for multimodal analysis
@@ -831,5 +585,6 @@ The following additional features are available:
 - **"session already in use"** — A previous Claude Code process may still be running. Use `/new` to start a fresh session.
 - **No response from bot** — Check `cc-connect` logs. Set `level = "debug"` in `[log]` for verbose output.
 - **WeChat Work can't send messages** — Ensure your outbound IP is in the Trusted IP whitelist. If using a proxy, check the proxy is reachable.
-- **LINE/WeChat Work can't receive messages** — Ensure your webhook URL is publicly accessible (ngrok/cloudflared running).
+- **WeChat Work can't receive messages** — Ensure your webhook URL is publicly accessible (ngrok/cloudflared running).
 - **macOS binary won't open** — Run `xattr -d com.apple.quarantine cc-connect` to remove quarantine flag.
+

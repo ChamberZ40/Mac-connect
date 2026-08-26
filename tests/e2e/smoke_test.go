@@ -159,10 +159,7 @@ func TestSmoke_AllPlatformsInit(t *testing.T) {
 }
 
 func listRegisteredPlatforms() []string {
-	platforms := []string{
-		"feishu", "telegram", "discord", "slack",
-		"dingtalk", "wecom", "qq", "qqbot", "line",
-	}
+	platforms := []string{"feishu", "wecom", "weixin"}
 	return platforms
 }
 

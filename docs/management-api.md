@@ -169,7 +169,7 @@ Returns system status and summary.
   "data": {
     "version": "v1.2.0",
     "uptime_seconds": 3600,
-    "connected_platforms": ["feishu", "telegram"],
+    "connected_platforms": ["feishu", "wecom"],
     "projects_count": 2,
     "bridge_adapters": [
       {
@@ -200,8 +200,8 @@ Triggers a graceful restart. The process will shut down cleanly and exec itself.
 
 ```json
 {
-  "session_key": "telegram:123:456",
-  "platform": "telegram"
+  "session_key": "wecom:ww_chat:ww_user",
+  "platform": "wecom"
 }
 ```
 
@@ -334,7 +334,7 @@ Lists all projects with a summary.
       {
         "name": "my-backend",
         "agent_type": "claudecode",
-        "platforms": ["feishu", "telegram"],
+        "platforms": ["feishu", "wecom"],
         "sessions_count": 3,
         "heartbeat_enabled": true
       }
@@ -369,17 +369,17 @@ Returns detailed information for a single project.
         "connected": true
       },
       {
-        "type": "telegram",
+        "type": "wecom",
         "connected": true
       }
     ],
     "sessions_count": 3,
-    "active_session_keys": ["telegram:123:456", "feishu:ou_xxx:chat_xxx"],
+    "active_session_keys": ["wecom:ww_chat:ww_user", "feishu:ou_xxx:chat_xxx"],
     "heartbeat": {
       "enabled": true,
       "paused": false,
       "interval_mins": 30,
-      "session_key": "telegram:123:456"
+      "session_key": "wecom:ww_chat:ww_user"
     },
     "settings": {
       "quiet": false,
@@ -460,9 +460,9 @@ Lists sessions for a project with summary info including the last message previe
     "sessions": [
       {
         "id": "sess_abc123",
-        "session_key": "telegram:123:456",
+        "session_key": "wecom:ww_chat:ww_user",
         "name": "work",
-        "platform": "telegram",
+        "platform": "wecom",
         "agent_type": "claudecode",
         "active": true,
         "live": true,
@@ -479,7 +479,7 @@ Lists sessions for a project with summary info including the last message previe
       }
     ],
     "active_keys": {
-      "telegram:123:456": "telegram"
+      "wecom:ww_chat:ww_user": "wecom"
     }
   }
 }
@@ -504,14 +504,14 @@ Creates a new session.
 
 ```json
 {
-  "session_key": "telegram:123:456",
+  "session_key": "wecom:ww_chat:ww_user",
   "name": "work"
 }
 ```
 
 | Field        | Type   | Required | Description                          |
 |--------------|--------|----------|--------------------------------------|
-| `session_key`| string | yes      | Platform routing key (e.g. `telegram:123:456`) |
+| `session_key`| string | yes      | Platform routing key (e.g. `wecom:ww_chat:ww_user`) |
 | `name`       | string | no       | Human-readable session name           |
 
 **Response:**
@@ -521,7 +521,7 @@ Creates a new session.
   "ok": true,
   "data": {
     "id": "sess_xyz789",
-    "session_key": "telegram:123:456",
+    "session_key": "wecom:ww_chat:ww_user",
     "name": "work",
     "created_at": "2026-03-10T10:35:00Z"
   }
@@ -554,9 +554,9 @@ Returns session detail including message history.
   "ok": true,
   "data": {
     "id": "sess_abc123",
-    "session_key": "telegram:123:456",
+    "session_key": "wecom:ww_chat:ww_user",
     "name": "work",
-    "platform": "telegram",
+    "platform": "wecom",
     "agent_type": "claudecode",
     "agent_session_id": "as_xxx",
     "active": true,
@@ -611,7 +611,7 @@ Switches the active session for a given session_key (e.g. when a user has multip
 
 ```json
 {
-  "session_key": "telegram:123:456",
+  "session_key": "wecom:ww_chat:ww_user",
   "session_id": "sess_xyz789"
 }
 ```
@@ -643,7 +643,7 @@ Sends a message to a session. The message is delivered to the agent as if the us
 
 ```json
 {
-  "session_key": "telegram:123:456",
+  "session_key": "wecom:ww_chat:ww_user",
   "message": "Review the latest commit"
 }
 ```
@@ -858,7 +858,7 @@ Lists all cron jobs, optionally filtered by project.
       {
         "id": "cron_abc123",
         "project": "my-backend",
-        "session_key": "telegram:123:456",
+        "session_key": "wecom:ww_chat:ww_user",
         "cron_expr": "0 6 * * *",
         "prompt": "Summarize GitHub trending",
         "exec": "",
@@ -886,7 +886,7 @@ Adds a cron job. Either `prompt` or `exec` must be provided, not both.
 ```json
 {
   "project": "my-backend",
-  "session_key": "telegram:123:456",
+  "session_key": "wecom:ww_chat:ww_user",
   "cron_expr": "0 6 * * *",
   "prompt": "Summarize GitHub trending",
   "description": "Daily GitHub Trending",
@@ -899,7 +899,7 @@ Adds a cron job. Either `prompt` or `exec` must be provided, not both.
 ```json
 {
   "project": "my-backend",
-  "session_key": "telegram:123:456",
+  "session_key": "wecom:ww_chat:ww_user",
   "cron_expr": "0 9 * * 1",
   "exec": "npm run weekly-report",
   "work_dir": "/path/to/project",
@@ -929,7 +929,7 @@ Adds a cron job. Either `prompt` or `exec` must be provided, not both.
   "data": {
     "id": "cron_xyz789",
     "project": "my-backend",
-    "session_key": "telegram:123:456",
+    "session_key": "wecom:ww_chat:ww_user",
     "cron_expr": "0 6 * * *",
     "prompt": "Summarize GitHub trending",
     "description": "Daily GitHub Trending",
@@ -993,7 +993,7 @@ Returns heartbeat status.
     "paused": false,
     "interval_mins": 30,
     "only_when_idle": true,
-    "session_key": "telegram:123:456",
+    "session_key": "wecom:ww_chat:ww_user",
     "silent": true,
     "run_count": 42,
     "error_count": 0,
@@ -1157,10 +1157,9 @@ The `session_key` is a composite identifier used to route messages to the correc
 
 Examples:
 
-- `telegram:123456789:123456789` — Telegram user 123456789 in chat 123456789
 - `feishu:ou_xxx:chat_yyy` — Feishu user in chat
-- `slack:C01234:U05678` — Slack channel and user
-- `discord:123456789:987654321` — Discord guild and user
+- `wecom:ww_chat_id:ww_user_id` — WeChat Work chat and user
+- `weixin:wxid_group:wxid_user` — Weixin group and user
 
 For multi-workspace mode, the format may include a workspace prefix:
 

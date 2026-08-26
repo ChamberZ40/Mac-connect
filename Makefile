@@ -26,17 +26,15 @@ PLATFORMS := \
 # By default all agents and platforms are included. To build with only
 # specific ones, set AGENTS and/or PLATFORMS_INCLUDE:
 #
-#   make build AGENTS=claudecode PLATFORMS_INCLUDE=feishu,telegram
+#   make build AGENTS=claudecode PLATFORMS_INCLUDE=feishu,weixin
 #
 # You can also exclude specific ones:
 #
-#   make build EXCLUDE=discord,dingtalk,qq,qqbot,line
+#   make build EXCLUDE=wecom
 # ---------------------------------------------------------------------------
 
-ALL_AGENTS    := acp antigravity claudecode codex copilot cursor devin gemini iflow kimi opencode pi qoder tmux
-ALL_PLATFORMS := feishu telegram discord slack dingtalk wecom weixin qq qqbot line weibo max matrix webex wps-agentspace tuitui
-ALL_AGENTS    := acp antigravity claudecode codex copilot cursor devin gemini iflow kimi opencode pi qoder reasonix tmux
-ALL_PLATFORMS := feishu telegram discord slack dingtalk wecom weixin qq qqbot line weibo max matrix webex cloud_web tuitui googlechat
+ALL_AGENTS    := acp claudecode codex copilot cursor
+ALL_PLATFORMS := feishu wecom weixin
 ALL_EXTRAS    := web
 
 COMMA := ,

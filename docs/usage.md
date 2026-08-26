@@ -102,21 +102,12 @@ All agents support permission modes switchable at runtime via `/mode`.
 | Plan | `plan` | Read-only analysis |
 | Ask | `ask` | Q&A style, read-only |
 
-### Gemini CLI Modes
+### GitHub Copilot CLI Modes
 
 | Mode | Config Value | Behavior |
 |------|-------------|----------|
-| Default | `default` | Prompt for approval |
-| Auto Edit | `auto_edit` / `edit` | Auto-approve edits |
-| YOLO | `yolo` | Auto-approve all |
-| Plan | `plan` | Read-only plan mode |
-
-### Qoder CLI / OpenCode / iFlow CLI
-
-| Mode | Config Value | Behavior |
-|------|-------------|----------|
-| Default | `default` | Standard permissions |
-| YOLO | `yolo` | Skip all checks |
+| Default | `default` | Every tool call requires approval |
+| YOLO | `bypassPermissions` / `yolo` | Auto-approve everything |
 
 ### Configuration
 
@@ -208,9 +199,8 @@ cc-connect provider import --project my-backend  # from cc-switch
 |-------|-----------|------------|
 | Claude Code | `ANTHROPIC_API_KEY` | `ANTHROPIC_BASE_URL` |
 | Codex | `OPENAI_API_KEY` | `OPENAI_BASE_URL` |
-| Gemini CLI | `GEMINI_API_KEY` | use `env` map |
-| OpenCode | `ANTHROPIC_API_KEY` | use `env` map |
-| iFlow CLI | `IFLOW_API_KEY` | `IFLOW_BASE_URL` |
+| Cursor Agent | `CURSOR_API_KEY` | use `env` map |
+| GitHub Copilot CLI | — (uses `copilot` login) | use `env` map |
 
 ---
 
@@ -660,7 +650,7 @@ cc-connect sets `CC_CONNECT_PERMISSION_HOOK_SKIP=1` in the Claude Code subproces
 
 Send voice messages — cc-connect transcribes them automatically.
 
-**Supported:** Feishu, WeChat Work, Telegram, LINE, Discord, Slack
+**Supported:** Feishu, WeChat Work, Weixin
 
 **Requirements:** OpenAI/Groq API key, `ffmpeg`
 
@@ -698,7 +688,7 @@ brew install ffmpeg
 
 Synthesize AI replies into voice messages.
 
-**Supported:** Platforms that implement audio sending, such as Feishu/Lark, DingTalk, Telegram, Max, and Weixin.
+**Supported:** Platforms that implement audio sending, such as Feishu/Lark and Weixin.
 
 ### Configure
 
@@ -742,7 +732,6 @@ When an agent generates a local image, PDF, report, bundle, or other file and ne
 
 **Currently supported platforms:**
 - Feishu
-- Telegram
 
 ### When to run setup first
 
@@ -930,14 +919,14 @@ Cross-platform bot communication in group chats.
 ```
 /bind              Show bindings
 /bind claudecode   Add claudecode project
-/bind gemini       Add gemini project
+/bind codex        Add codex project
 /bind -claudecode  Remove claudecode
 ```
 
 ### Bot-to-Bot Communication
 
 ```bash
-cc-connect relay send --to gemini "What do you think about this architecture?"
+cc-connect relay send --to codex "What do you think about this architecture?"
 ```
 
 ---
@@ -1141,7 +1130,7 @@ See [config.example.toml](../config.example.toml) for full examples.
 name = "my-project"
 
 [projects.agent]
-type = "claudecode"  # or codex, cursor, gemini, qoder, opencode, iflow
+type = "claudecode"  # or codex, cursor, copilot, acp
 
 [projects.agent.options]
 work_dir = "/path/to/project"
@@ -1149,7 +1138,7 @@ mode = "default"
 provider = "anthropic"
 
 [[projects.platforms]]
-type = "feishu"  # or wps-xiezuo, dingtalk, telegram, slack, discord, wecom, weixin, line, qq, qqbot
+type = "feishu"  # or wecom, weixin
 
 [projects.platforms.options]
 # platform-specific options
@@ -1243,27 +1232,6 @@ Common pitfalls:
 
 For more on the `weixin` platform, see [docs/weixin.md](./weixin.md).
 
-### Telegram proxy / outbound restrictions (issue #245)
 
-The Telegram platform supports HTTP and SOCKS5 forward proxies directly in
-`[projects.platforms.options]`. You do not need a system-wide proxy or a
-sidecar — set the proxy per Telegram instance.
 
-```toml
-[[projects.platforms]]
-type = "telegram"
 
-[projects.platforms.options]
-token = "${TELEGRAM_BOT_TOKEN}"
-proxy = "http://127.0.0.1:7890"     # or socks5://127.0.0.1:1080
-proxy_username = ""                  # leave empty if no auth
-proxy_password = ""
-```
-
-`proxy` accepts both `http://` and `socks5://` URLs. Authentication is
-optional. The proxy only affects the Telegram Bot API calls for that
-platform instance; other platforms and the management API are not
-tunneled through it.
-
-Full reference: [docs/telegram.md](./telegram.md#21-optional-use-a-proxy).
-This option was added in PR #389.

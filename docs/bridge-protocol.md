@@ -14,7 +14,7 @@ The Bridge Protocol allows **external platform adapters** written in any program
 │                    cc-connect                        │
 │                                                      │
 │   ┌────────────┐ ┌────────────┐ ┌────────────────┐  │
-│   │  Telegram   │ │   Feishu   │ │ BridgePlatform │  │
+│   │    WeCom    │ │   Feishu   │ │ BridgePlatform │  │
 │   │  (native)   │ │  (native)  │ │  (WebSocket)   │  │
 │   └─────┬──────┘ └─────┬──────┘ └───────┬────────┘  │
 │         │              │                │            │

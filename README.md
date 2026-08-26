@@ -217,17 +217,15 @@ High-level view of what each **built-in platform** can do in cc-connect.
 | ⚠️ | Partial, needs extra config (e.g. speech / ASR), or limited by the vendor app or API |
 | ❌ | Not supported or not applicable in practice |
 
-† **QQ (NapCat / OneBot)** — unofficial self-hosted bridge; behaviour depends on your NapCat / network setup.
-
-| Capability | Feishu | WPS Xiezuo | DingTalk | Telegram | Slack | Discord | LINE | WeCom | Weibo | **Weixin**<br>*(personal)* | QQ† | QQ Bot | Matrix |
-|------------|:------:|:----------:|:--------:|:--------:|:-----:|:-------:|:----:|:-----:|:-----:|:-------------------------:|:---:|:------:|:------:|
-| Text & slash commands | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Markdown / cards | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ✅ | ⚠️ |
-| Streaming / chunked replies | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Images & files | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Voice / STT / TTS | ⚠️ | ❌ | ⚠️ | ✅ | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ✅ | ⚠️ | ⚠️ | ❌ |
-| Private (DM) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Group / channel | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Capability | Feishu | WeCom | **Weixin**<br>*(personal)* |
+|------------|:------:|:-----:|:-------------------------:|
+| Text & slash commands | ✅ | ✅ | ✅ |
+| Markdown / cards | ✅ | ⚠️ | ✅ |
+| Streaming / chunked replies | ✅ | ✅ | ✅ |
+| Images & files | ✅ | ✅ | ✅ |
+| Voice / STT / TTS | ⚠️ | ⚠️ | ✅ |
+| Private (DM) | ✅ | ✅ | ✅ |
+| Group / channel | ✅ | ✅ | ✅ |
 
 > **WeCom:** Webhook mode needs a **public URL**; long-connection / WS style setups often do not.  
 > **Voice row:** many platforms need `[speech]` / TTS providers enabled in `config.toml`; values are a best-effort summary.  
@@ -237,13 +235,13 @@ High-level view of what each **built-in platform** can do in cc-connect.
 ## ✨ Why cc-connect?
 
 ### 🤖 Universal Agent Support
-**10+ AI Agents** — Claude Code, Codex, Cursor Agent, Kimi CLI, Qoder CLI, Gemini CLI, OpenCode, iFlow CLI, Pi, Devin, Copilot — plus any agent that supports the [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/agents). Use whichever fits your workflow, or all of them at once.
+**5 AI Agents** — Claude Code, Codex, Cursor Agent, GitHub Copilot CLI — plus any agent that supports the [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/agents), such as OpenClaw. Use whichever fits your workflow, or all of them at once.
 
 ### 📱 Platform Flexibility
-**13 Chat Platforms** — Feishu, WPS Xiezuo, DingTalk, Slack, Telegram, Discord, WeChat Work, Weibo, LINE, QQ, QQ Bot (Official), Matrix, plus **Weixin (personal ilink)** for **personal WeChat**. Most platforms need **zero public IP**.
+**3 Chat Platforms** — Feishu (Lark), WeChat Work, plus **Weixin (personal ilink)** for **personal WeChat**. All three need **zero public IP**.
 
 ### 🔄 Multi-Agent Orchestration
-**Multi-Bot Relay** — Bind multiple bots in a group chat and let them communicate with each other. Ask Claude, get insights from Gemini — all in one conversation.
+**Multi-Bot Relay** — Bind multiple bots in a group chat and let them communicate with each other. Ask Claude, get a second opinion from Codex — all in one conversation.
 
 ### 🎮 Complete Chat Control
 **Full Control from Chat** — Switch models (`/model`), tune reasoning (`/reasoning`), change permission modes (`/mode`), manage sessions, all via slash commands.
@@ -267,12 +265,11 @@ High-level view of what each **built-in platform** can do in cc-connect.
 
 
 <p align="center">
-  <img src="docs/images/screenshot/cc-connect-lark.JPG" alt="飞书" width="32%" />
-  <img src="docs/images/screenshot/cc-connect-telegram.JPG" alt="Telegram" width="32%" />
-  <img src="docs/images/screenshot/cc-connect-wechat.JPG" alt="微信" width="32%" />
+  <img src="docs/images/screenshot/cc-connect-lark.JPG" alt="飞书" width="45%" />
+  <img src="docs/images/screenshot/cc-connect-wechat.JPG" alt="微信" width="45%" />
 </p>
 <p align="center">
-  <em>Left：Lark &nbsp;|&nbsp; Telegram &nbsp;|&nbsp; Right：Wechat</em>
+  <em>Left：Lark &nbsp;|&nbsp; Right：Wechat</em>
 </p>
 
 
@@ -293,24 +290,19 @@ npm install -g @anthropic-ai/claude-code   # any platform via npm
 # OpenAI Codex
 npm install -g @openai/codex
 
-# Google Gemini CLI
-npm install -g @google/gemini-cli
-
-# iFlow CLI
-npm install -g @iflow-ai/iflow-cli
-
-# Qoder CLI
-curl -fsSL https://qoder.com/install | bash
+# GitHub Copilot CLI
+npm install -g @github/copilot
 ```
 
-For **Cursor Agent** and **OpenCode**, follow the official install pages:
+For **Cursor Agent**, follow the official install page:
 - Cursor Agent: <https://docs.cursor.com/agent>
-- OpenCode: <https://github.com/opencode-ai/opencode>
+
+Any other agent that speaks ACP (e.g. OpenClaw) works through `type = "acp"`.
 
 Verify the binary is on your `PATH`:
 
 ```bash
-claude --version       # or: codex / gemini / opencode / qodercli / cursor-agent ...
+claude --version       # or: codex / copilot / cursor-agent ...
 ```
 
 ### 2️⃣ Authenticate the agent
@@ -320,7 +312,7 @@ Each agent has its own login flow — run the agent once interactively so it sto
 ```bash
 claude login           # opens a browser to authenticate
 # or
-codex login            # /gemini / opencode auth — see the agent's docs
+codex login            # or: copilot / cursor-agent — see the agent's docs
 ```
 
 If you skip this step, `cc-connect` will still start, but the agent will reject every prompt with an auth error.
@@ -355,7 +347,7 @@ Open that URL in your browser. If `9820` is already in use, pass `--web-port 982
 
 ### 5️⃣ Configure platform bot tokens in the Web UI
 
-In the Web UI, create a project, then add at least one platform (Feishu / Telegram / Discord / Slack / DingTalk / WeChat Work / QQ / LINE / Weixin) and paste the bot token from that platform's developer console. Save and cc-connect will hot-reload.
+In the Web UI, create a project, then add at least one platform (Feishu / WeChat Work / Weixin) and paste the credentials from that platform's developer console. Save and cc-connect will hot-reload.
 
 That's it — send a message to your bot and cc-connect will relay it to your local agent.
 
@@ -451,30 +443,11 @@ cc-connect update --pre     # Include pre-releases
 | Agent | Claude Code | ✅ Supported |
 | Agent | Codex (OpenAI) | ✅ Supported |
 | Agent | Cursor Agent | ✅ Supported |
-| Agent | Gemini CLI (Google) | ✅ Supported |
-| Agent | Qoder CLI | ✅ Supported |
-| Agent | OpenCode (Crush) | ✅ Supported |
-| Agent | iFlow CLI | ✅ Supported |
-| Agent | Kimi CLI (Moonshot) | ✅ Supported |
-| Agent | Pi (Cursor Background Agent) | ✅ Supported |
 | Agent | Copilot (GitHub) | ✅ Supported |
-| Agent | ACP (Agent Client Protocol) | ✅ Any [ACP-compatible agent](https://agentclientprotocol.com/get-started/agents) |
-| Agent | Devin (Cognition) | ✅ Supported (via ACP) |
-| Agent | Goose (Block) | 🔜 Planned |
-| Agent | Aider | 🔜 Planned |
+| Agent | ACP (Agent Client Protocol) | ✅ Any [ACP-compatible agent](https://agentclientprotocol.com/get-started/agents), e.g. OpenClaw |
 | Platform | Feishu (Lark) | ✅ WebSocket — no public IP needed |
-| Platform | DingTalk | ✅ Stream — no public IP needed |
-| Platform | WPS Xiezuo | ✅ WebSocket — no public IP needed |
-| Platform | Telegram | ✅ Long Polling — no public IP needed |
-| Platform | Slack | ✅ Socket Mode — no public IP needed |
-| Platform | Discord | ✅ Gateway — no public IP needed |
-| Platform | Weibo | ✅ WebSocket — no public IP needed |
-| Platform | LINE | ✅ Webhook — public URL required |
 | Platform | WeChat Work | ✅ WebSocket / Webhook |
-| Platform | Weixin (personal, ilink) | ✅— HTTP long polling — no public IP needed |
-| Platform | QQ (NapCat/OneBot) | ✅ WebSocket |
-| Platform | QQ Bot (Official) | ✅ WebSocket — no public IP needed |
-| Platform | Matrix | ✅ Long Polling (/sync) — no public IP needed |
+| Platform | Weixin (personal, ilink) | ✅ HTTP long polling — no public IP needed |
 
 
 ## 📖 Platform Setup Guides
@@ -482,17 +455,8 @@ cc-connect update --pre     # Include pre-releases
 | Platform | Guide | Connection | Public IP? |
 |----------|-------|------------|------------|
 | Feishu (Lark) | [docs/feishu.md](docs/feishu.md) | WebSocket | No |
-| DingTalk | [docs/dingtalk.md](docs/dingtalk.md) | Stream | No |
-| WPS Xiezuo | [docs/wps-xiezuo.md](docs/wps-xiezuo.md) | WebSocket | No |
-| Telegram | [docs/telegram.md](docs/telegram.md) | Long Polling | No |
-| Slack | [docs/slack.md](docs/slack.md) | Socket Mode | No |
-| Google Chat | [docs/googlechat.md](docs/googlechat.md) | Cloud Pub/Sub | No |
-| Discord | [docs/discord.md](docs/discord.md) | Gateway | No |
-| Weibo | [docs/weibo.md](docs/weibo.md) | WebSocket | No |
 | WeChat Work | [docs/wecom.md](docs/wecom.md) | WebSocket / Webhook | No (WS) / Yes (Webhook) |
 | Weixin (personal) | [docs/weixin.md](docs/weixin.md) | HTTP long polling (ilink) | No |
-| QQ / QQ Bot | [docs/qq.md](docs/qq.md) | WebSocket | No |
-| Matrix | [docs/matrix.md](docs/matrix.md) | /sync (Long Polling) | No |
 
 
 ## 🎯 Key Features
@@ -599,7 +563,6 @@ When an agent generates a local screenshot, chart, PDF, bundle, or other file, i
 
 First release supports:
 - Feishu
-- Telegram
 
 If your agent does not natively inject the system prompt, run this once in chat after upgrading:
 
