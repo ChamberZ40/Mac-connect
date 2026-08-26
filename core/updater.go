@@ -37,6 +37,12 @@ type ReleaseInfo struct {
 // CheckForUpdate queries GitHub/Gitee for newer releases.
 // If preferGitee is true, tries Gitee first (faster in China); otherwise GitHub first.
 func CheckForUpdate(currentVersion string, preferGitee bool) (*ReleaseInfo, error) {
+	// Checked before fetching: an uncomparable local version cannot produce a
+	// trustworthy answer, so the network round-trip is wasted either way.
+	if err := validateComparableVersion(currentVersion); err != nil {
+		return nil, err
+	}
+
 	releases, err := fetchReleases(preferGitee)
 	if err != nil {
 		return nil, err
@@ -297,12 +303,20 @@ func replaceBinary(newBinary []byte) error {
 
 // --- semver comparison ---
 
-var semverRe = regexp.MustCompile(`^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$`)
+// semverRe accepts an optional `+build` suffix. Build metadata carries no
+// precedence (SemVer 2.0 §10) so it is captured and discarded, but it must parse:
+// a locally built binary is stamped like `v1.5.0+toolpanel.3`, and rejecting that
+// used to yield the zero semver — 0.0.0, which is behind every release.
+var semverRe = regexp.MustCompile(`^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$`)
 
 type semver struct {
 	major, minor, patch int
 	pre                 string
 	preNum              int
+	// valid records whether the version parsed at all. Without it an
+	// unrecognizable version is indistinguishable from a genuine 0.0.0, and
+	// callers silently treat an unknown build as the oldest release in existence.
+	valid bool
 }
 
 func parseSemver(v string) semver {
@@ -318,7 +332,17 @@ func parseSemver(v string) semver {
 	if idx := strings.LastIndex(pre, "."); idx >= 0 {
 		preNum, _ = strconv.Atoi(pre[idx+1:])
 	}
-	return semver{major: major, minor: minor, patch: patch, pre: pre, preNum: preNum}
+	return semver{major: major, minor: minor, patch: patch, pre: pre, preNum: preNum, valid: true}
+}
+
+// validateComparableVersion rejects a local version that cannot be ordered
+// against a release tag. Refusing to answer is the only honest option: guessing
+// "behind" offers a downgrade, guessing "current" hides a real update.
+func validateComparableVersion(current string) error {
+	if parseSemver(current).valid {
+		return nil
+	}
+	return fmt.Errorf("updater: cannot compare local version %q against release tags", strings.TrimSpace(current))
 }
 
 func normalizeVersion(v string) string {
