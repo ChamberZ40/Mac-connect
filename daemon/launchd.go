@@ -27,11 +27,10 @@ var runLaunchctl = func(args ...string) (string, error) {
 
 type launchdManager struct{}
 
-// CheckLinger always returns true on macOS: launchd user agents persist
-// independently of login sessions, so no "linger" warning is needed.
-func CheckLinger() (enabled bool, user string) {
-	return true, ""
-}
+// CheckLinger is not defined here: check_linger_other.go already provides the
+// non-Linux stub under //go:build !linux, which covers darwin. Declaring it in
+// this darwin-tagged file too breaks the macOS build with "CheckLinger
+// redeclared in this block".
 
 func newPlatformManager() (Manager, error) {
 	return &launchdManager{}, nil
