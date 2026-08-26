@@ -297,6 +297,8 @@ const (
 
 	MsgStatusTitle           MsgKey = "status_title"
 	MsgReplyFooterRemaining  MsgKey = "reply_footer_remaining"
+	MsgFooterToolCount       MsgKey = "footer_tool_count"
+	MsgFooterFilesChanged    MsgKey = "footer_files_changed"
 	MsgModelCurrent          MsgKey = "model_current"
 	MsgModelChanged          MsgKey = "model_changed"
 	MsgModelChangeFailed     MsgKey = "model_change_failed"
@@ -2193,6 +2195,21 @@ var messages = map[MsgKey]map[Language]string{
 		LangTraditionalChinese: "剩餘 %d%%",
 		LangJapanese:           "残り %d%%",
 		LangSpanish:            "%d%% restante",
+	},
+	// Activity segments of the rich-card status footer: "🔧 4 tools · 2 changed: a.go, b.go".
+	MsgFooterToolCount: {
+		LangEnglish:            "%d tools",
+		LangChinese:            "工具 %d 次",
+		LangTraditionalChinese: "工具 %d 次",
+		LangJapanese:           "ツール %d 回",
+		LangSpanish:            "%d herramientas",
+	},
+	MsgFooterFilesChanged: {
+		LangEnglish:            "%d changed: %s",
+		LangChinese:            "改动 %d: %s",
+		LangTraditionalChinese: "改動 %d: %s",
+		LangJapanese:           "変更 %d: %s",
+		LangSpanish:            "%d modificados: %s",
 	},
 	MsgModelCurrent: {
 		LangEnglish:            "Current model: %s",

@@ -1177,24 +1177,36 @@ func (s *appServerSession) handleItemStarted(item map[string]any) {
 	switch itemType {
 	case "commandExecution":
 		command, _ := item["command"].(string)
-		s.emit(core.Event{Type: core.EventToolUse, ToolName: "Bash", ToolInput: command})
+		s.emit(core.Event{Type: core.EventToolUse, ToolName: "Bash", ToolInput: command, ToolID: codexItemCallID(item)})
 
 	case "mcpToolCall":
 		server, _ := item["server"].(string)
 		tool, _ := item["tool"].(string)
 		name := strings.Trim(strings.Join([]string{server, tool}, ":"), ":")
-		s.emit(core.Event{Type: core.EventToolUse, ToolName: "MCP", ToolInput: name + "\n" + appServerJSON(item["arguments"])})
+		s.emit(core.Event{
+			Type:            core.EventToolUse,
+			ToolName:        "MCP",
+			ToolInput:       name + "\n" + appServerJSON(item["arguments"]),
+			ToolDescription: core.ToolCallDescription(item["arguments"]),
+			ToolID:          codexItemCallID(item),
+		})
 
 	case "webSearch":
 		query, _ := item["query"].(string)
-		s.emit(core.Event{Type: core.EventToolUse, ToolName: "WebSearch", ToolInput: query})
+		s.emit(core.Event{Type: core.EventToolUse, ToolName: "WebSearch", ToolInput: query, ToolID: codexItemCallID(item)})
 
 	case "dynamicToolCall":
 		tool, _ := item["tool"].(string)
-		s.emit(core.Event{Type: core.EventToolUse, ToolName: tool, ToolInput: appServerJSON(item["arguments"])})
+		s.emit(core.Event{
+			Type:            core.EventToolUse,
+			ToolName:        tool,
+			ToolInput:       appServerJSON(item["arguments"]),
+			ToolDescription: core.ToolCallDescription(item["arguments"]),
+			ToolID:          codexItemCallID(item),
+		})
 
 	case "fileChange":
-		s.emit(core.Event{Type: core.EventToolUse, ToolName: "Patch", ToolInput: appServerJSON(item["changes"])})
+		s.emit(core.Event{Type: core.EventToolUse, ToolName: "Patch", ToolInput: appServerJSON(item["changes"]), ToolID: codexItemCallID(item)})
 	}
 }
 
@@ -1237,6 +1249,7 @@ func (s *appServerSession) handleItemCompleted(item map[string]any) {
 			ToolStatus:   strings.TrimSpace(status),
 			ToolExitCode: exitCodePtr,
 			ToolSuccess:  &success,
+			ToolID:       codexItemCallID(item),
 		})
 
 	case "mcpToolCall":
@@ -1253,6 +1266,7 @@ func (s *appServerSession) handleItemCompleted(item map[string]any) {
 			ToolResult:  truncate(strings.TrimSpace(result), 500),
 			ToolStatus:  strings.TrimSpace(status),
 			ToolSuccess: &success,
+			ToolID:      codexItemCallID(item),
 		})
 
 	case "webSearch":
@@ -1261,6 +1275,7 @@ func (s *appServerSession) handleItemCompleted(item map[string]any) {
 			Type:       core.EventToolResult,
 			ToolName:   "WebSearch",
 			ToolResult: truncate(strings.TrimSpace(query), 500),
+			ToolID:     codexItemCallID(item),
 		})
 
 	case "dynamicToolCall":
@@ -1274,6 +1289,7 @@ func (s *appServerSession) handleItemCompleted(item map[string]any) {
 			ToolResult:  truncate(strings.TrimSpace(result), 500),
 			ToolStatus:  strings.TrimSpace(status),
 			ToolSuccess: &success,
+			ToolID:      codexItemCallID(item),
 		})
 	}
 }

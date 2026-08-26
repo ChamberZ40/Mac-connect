@@ -63,14 +63,30 @@ const (
 
 // ToolStep is one summarized progress row shown in rich progress cards.
 type ToolStep struct {
-	Kind     ToolStepKind // progress row kind; empty means tool for backward compatibility
-	Name     string       // tool name (e.g. "Bash", "Edit")
-	Summary  string       // human-readable summary shown in the card
-	Result   string       // optional tool output/result summary
-	Status   string       // optional tool status (e.g. completed/failed)
-	ExitCode *int         // optional process exit code
-	Success  *bool        // optional success flag
-	Done     bool         // true once a tool result has been observed
+	Kind    ToolStepKind // progress row kind; empty means tool for backward compatibility
+	Name    string       // tool name (e.g. "Bash", "Edit")
+	Summary string       // human-readable summary shown in the card
+	// CallID is the agent's own identifier for this invocation, when it supplies
+	// one. It is what lets a result be matched to the call it belongs to, which
+	// name matching cannot do for parallel or repeated calls to the same tool.
+	CallID string
+	// Description is the agent-authored natural-language intent of the call
+	// ("List files in current directory"), when the agent supplies one. Summary
+	// keeps the raw argument (the shell command, the path) so platforms can still
+	// classify the call by it; renderers prefer Description for display because a
+	// multi-line script makes a poor one-line label.
+	Description string
+	Result      string // optional tool output/result summary
+	Status      string // optional tool status (e.g. completed/failed)
+	ExitCode    *int   // optional process exit code
+	Success     *bool  // optional success flag
+	Done        bool   // true once a tool result has been observed
+	// StartedAt is when the invocation was first observed; zero when unknown.
+	StartedAt time.Time
+	// Duration is the wall-clock time from invocation to result. Zero while the
+	// call is still running and for steps whose timing was never observed, so
+	// renderers must treat zero as "unknown" rather than "instant".
+	Duration time.Duration
 }
 
 // RichCardSupporter is an optional interface for platforms that can build
@@ -88,6 +104,18 @@ type ToolStep struct {
 // uniformly with the rest of the footer.)
 type RichCardSupporter interface {
 	BuildRichCard(status CardStatus, title string, steps []ToolStep, markdown string, streaming bool, statusFooter string) string
+}
+
+// RichCardLocalizer is an optional interface for platforms that render rich-card
+// chrome themselves — collapsible panel titles, per-step status words — and so
+// need to know the current UI language. Unlike statusFooter, which the engine
+// composes and localizes, that chrome is assembled inside the platform.
+//
+// The engine calls this before building a rich card, so a runtime /lang switch
+// takes effect on the next turn without a restart. Implementations must be safe
+// to call from the platform's own goroutines.
+type RichCardLocalizer interface {
+	SetRichCardLang(lang string)
 }
 
 // RichCardMarkdownResolver is an optional interface for platforms that need to

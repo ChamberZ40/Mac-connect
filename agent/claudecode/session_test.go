@@ -631,9 +631,9 @@ func makeFiller(n int) string {
 // assistant text reaches the user.
 //
 // Cases covered:
-//  - string content (plain text result)
-//  - array content (Anthropic SDK multi-block: [{type:"text", text:"..."}])
-//  - is_error=true (exit code 1, success=false)
+//   - string content (plain text result)
+//   - array content (Anthropic SDK multi-block: [{type:"text", text:"..."}])
+//   - is_error=true (exit code 1, success=false)
 func TestHandleUserEmitsToolResult(t *testing.T) {
 	cases := []struct {
 		name        string
@@ -649,10 +649,10 @@ func TestHandleUserEmitsToolResult(t *testing.T) {
 				"message": map[string]any{
 					"content": []any{
 						map[string]any{
-							"type":          "tool_result",
-							"tool_use_id":   "toolu_abc",
-							"is_error":      false,
-							"content":       "command output here",
+							"type":        "tool_result",
+							"tool_use_id": "toolu_abc",
+							"is_error":    false,
+							"content":     "command output here",
 						},
 					},
 				},
@@ -743,6 +743,48 @@ func TestHandleUserEmitsToolResult(t *testing.T) {
 				t.Fatal("timeout waiting for EventToolResult — handleUser dropped the tool_result")
 			}
 		})
+	}
+}
+
+// The card correlates a result with its call by id. Without the id plumbed
+// through, a nameless tool_result could not be matched to its tool_use and the
+// progress card grew a phantom row per call.
+func TestToolCallIDsAreCarriedThrough(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cs := &claudeSession{events: make(chan core.Event, 4), ctx: ctx}
+	cs.alive.Store(true)
+
+	cs.handleAssistant(map[string]any{
+		"type": "assistant",
+		"message": map[string]any{
+			"content": []any{
+				map[string]any{
+					"type":  "tool_use",
+					"id":    "toolu_abc",
+					"name":  "Bash",
+					"input": map[string]any{"command": "ls", "description": "List files"},
+				},
+			},
+		},
+	})
+	cs.handleUser(map[string]any{
+		"type": "user",
+		"message": map[string]any{
+			"content": []any{
+				map[string]any{"type": "tool_result", "tool_use_id": "toolu_abc", "content": "total 48"},
+			},
+		},
+	})
+
+	use := <-cs.events
+	if use.Type != core.EventToolUse || use.ToolID != "toolu_abc" {
+		t.Fatalf("tool use event = %+v, want ToolID toolu_abc", use)
+	}
+	result := <-cs.events
+	if result.Type != core.EventToolResult || result.ToolID != "toolu_abc" {
+		t.Fatalf("tool result event = %+v, want ToolID toolu_abc", result)
 	}
 }
 

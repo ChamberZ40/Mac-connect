@@ -500,7 +500,7 @@ func (cs *codexSession) handleItemStarted(raw map[string]any) {
 	switch itemType {
 	case "command_execution":
 		command, _ := item["command"].(string)
-		evt := core.Event{Type: core.EventToolUse, ToolName: "Bash", ToolInput: command}
+		evt := core.Event{Type: core.EventToolUse, ToolName: "Bash", ToolInput: command, ToolID: codexItemCallID(item)}
 		select {
 		case cs.events <- evt:
 		case <-cs.ctx.Done():
@@ -509,7 +509,13 @@ func (cs *codexSession) handleItemStarted(raw map[string]any) {
 	case "function_call":
 		name, _ := item["name"].(string)
 		args, _ := item["arguments"].(string)
-		evt := core.Event{Type: core.EventToolUse, ToolName: name, ToolInput: args}
+		evt := core.Event{
+			Type:            core.EventToolUse,
+			ToolName:        name,
+			ToolInput:       args,
+			ToolDescription: core.ToolCallDescription(args),
+			ToolID:          codexItemCallID(item),
+		}
 		select {
 		case cs.events <- evt:
 		case <-cs.ctx.Done():
@@ -568,6 +574,7 @@ func (cs *codexSession) handleItemCompleted(raw map[string]any) {
 			ToolStatus:   strings.TrimSpace(status),
 			ToolExitCode: &code,
 			ToolSuccess:  &success,
+			ToolID:       codexItemCallID(item),
 		}
 		select {
 		case cs.events <- evt:
@@ -589,6 +596,7 @@ func (cs *codexSession) handleItemCompleted(raw map[string]any) {
 			ToolResult:  truncate(strings.TrimSpace(output), 500),
 			ToolStatus:  strings.TrimSpace(status),
 			ToolSuccess: &success,
+			ToolID:      codexItemCallID(item),
 		}
 		select {
 		case cs.events <- evt:
@@ -608,7 +616,13 @@ func (cs *codexSession) handleItemCompleted(raw map[string]any) {
 	default:
 		if toolName, known := codexToolNames[itemType]; known {
 			input := codexExtractToolInput(item)
-			evt := core.Event{Type: core.EventToolUse, ToolName: toolName, ToolInput: input}
+			evt := core.Event{
+				Type:            core.EventToolUse,
+				ToolName:        toolName,
+				ToolInput:       input,
+				ToolDescription: codexToolDescription(item),
+				ToolID:          codexItemCallID(item),
+			}
 			select {
 			case cs.events <- evt:
 			case <-cs.ctx.Done():
@@ -622,6 +636,34 @@ func (cs *codexSession) handleItemCompleted(raw map[string]any) {
 
 // codexExtractToolInput extracts a human-readable input from a Codex tool item.
 // For web_search, it reads action.queries[] or falls back to the top-level query.
+// codexItemCallID reports the id Codex uses for one tool invocation. The same
+// id appears on the item's start and completion notifications, which is what
+// lets a result be matched to its own call — name matching cannot, because
+// Codex reports MCP starts as "MCP" and their completions by tool name, and
+// because parallel calls to one tool are indistinguishable by name.
+func codexItemCallID(item map[string]any) string {
+	for _, key := range []string{"call_id", "callId", "id", "item_id", "itemId"} {
+		if value, ok := item[key].(string); ok && strings.TrimSpace(value) != "" {
+			return strings.TrimSpace(value)
+		}
+	}
+	return ""
+}
+
+// codexToolDescription looks for the call's natural-language intent in the
+// places a Codex item can carry it: the tool arguments (where an MCP tool puts
+// its "description"), the nested action, or the item itself. Codex's own
+// command_execution items carry no such field, so shell calls keep falling back
+// to the command text.
+func codexToolDescription(item map[string]any) string {
+	for _, candidate := range []any{item["arguments"], item["action"], item} {
+		if description := core.ToolCallDescription(candidate); description != "" {
+			return description
+		}
+	}
+	return ""
+}
+
 func codexExtractToolInput(item map[string]any) string {
 	if action, ok := item["action"].(map[string]any); ok {
 		if queries, ok := action["queries"].([]any); ok && len(queries) > 0 {
