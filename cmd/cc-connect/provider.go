@@ -553,11 +553,11 @@ func runProviderPresets(args []string) {
 
 	fmt.Printf("Provider Presets (v%d)\n\n", data.Version)
 	for i, p := range data.Providers {
-		sponsor := ""
-		if p.Tier <= 1 {
-			sponsor = " ⭐ SPONSOR"
-		}
-		fmt.Printf("%d. %s%s\n", i+1, p.DisplayName, sponsor)
+		// No sponsor badge: upstream starred tier<=1 presets because their invite
+		// URLs carried its referral codes. Those codes are stripped from this
+		// fork's presets, so the badge would assert a relationship that does not
+		// exist here. Tier survives as sort order only (see ProviderList.tsx).
+		fmt.Printf("%d. %s\n", i+1, p.DisplayName)
 		if p.Description != "" {
 			fmt.Printf("   %s\n", p.Description)
 		}
