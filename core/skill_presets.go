@@ -11,10 +11,12 @@ import (
 )
 
 const (
-	defaultSkillPresetsURL         = "https://raw.githubusercontent.com/chenhg5/cc-connect/main/skill-presets.json"
-	fallbackSkillPresetsURL        = "https://gitee.com/chenhg5/cc-connect/raw/main/skill-presets.json"
-	skillPresetsCacheTTL           = 6 * time.Hour
-	skillPresetsHTTPTimeout        = 15 * time.Second
+	// Served from this fork for the same reason as the provider presets: a
+	// runtime fetch from upstream makes the local file decorative.
+	defaultSkillPresetsURL          = "https://raw.githubusercontent.com/ChamberZ40/Mac-connect/main/skill-presets.json"
+	fallbackSkillPresetsURL         = "https://cdn.jsdelivr.net/gh/ChamberZ40/Mac-connect@main/skill-presets.json"
+	skillPresetsCacheTTL            = 6 * time.Hour
+	skillPresetsHTTPTimeout         = 15 * time.Second
 	skillPresetsFallbackHTTPTimeout = 10 * time.Second
 )
 

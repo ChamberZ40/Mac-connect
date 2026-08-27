@@ -364,6 +364,9 @@ Full reference: [docs/usage.md](docs/usage.md).
 
 ## License
 
-Upstream [chenhg5/cc-connect](https://github.com/chenhg5/cc-connect) is
-published under the MIT License. This repository ships no `LICENSE` file yet —
-add one before distributing.
+[MIT](LICENSE) — use it however you like, commercially included; the only
+condition is keeping the copyright and permission notice.
+
+Upstream [chenhg5/cc-connect](https://github.com/chenhg5/cc-connect) declares MIT
+in `npm/package.json` but ships no `LICENSE` file, so [LICENSE](LICENSE) carries
+both its notice and this fork's.

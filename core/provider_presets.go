@@ -11,10 +11,20 @@ import (
 )
 
 const (
-	defaultPresetsURL         = "https://raw.githubusercontent.com/chenhg5/cc-connect/main/provider-presets.json"
-	fallbackPresetsURL        = "https://gitee.com/chenhg5/cc-connect/raw/main/provider-presets.json"
-	presetsCacheTTL           = 6 * time.Hour
-	presetsHTTPTimeout        = 15 * time.Second
+	// Both sources serve this fork's provider-presets.json, not upstream's.
+	// Upstream's copy carries per-provider referral codes (`aff=`, `track_id=`,
+	// `/invite/<code>`) and "exclusive discount for cc-connect users" copy that
+	// this deployment neither earns nor can honour. Because presets are fetched at
+	// runtime rather than compiled in, editing the local file is not enough — a
+	// source pointing at upstream re-pulls all of it within the 6h TTL.
+	//
+	// The fallback is a CDN view of the same repo and commit, not a different
+	// project: a fallback that served upstream's list would silently undo the
+	// removal exactly when the primary was unreachable.
+	defaultPresetsURL          = "https://raw.githubusercontent.com/ChamberZ40/Mac-connect/main/provider-presets.json"
+	fallbackPresetsURL         = "https://cdn.jsdelivr.net/gh/ChamberZ40/Mac-connect@main/provider-presets.json"
+	presetsCacheTTL            = 6 * time.Hour
+	presetsHTTPTimeout         = 15 * time.Second
 	presetsFallbackHTTPTimeout = 10 * time.Second
 )
 

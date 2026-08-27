@@ -69,9 +69,13 @@ level = "info" # debug, info, warn, error
 # This avoids duplicating API keys across projects.
 # 避免在多个项目中重复配置 API Key。
 #
-# Remote presets URL (fetches recommended providers list from GitHub/Gitee)
-# 远程预设列表 URL（从 GitHub/Gitee 拉取推荐服务商）
-# provider_presets_url = "https://raw.githubusercontent.com/chenhg5/cc-connect/main/provider-presets.json"
+# Remote presets URL (fetches the recommended providers list at runtime)
+# 远程预设列表 URL（运行时拉取推荐服务商列表）
+# Defaults to this fork's copy. Pointing this at upstream also re-pulls upstream's
+# per-provider referral codes and "cc-connect exclusive discount" copy.
+# 默认指向本 fork 的副本。指回上游会连带把各家服务商的推广码和「cc-connect 用户专享折扣」
+# 文案一起拉回来。
+# provider_presets_url = "https://raw.githubusercontent.com/ChamberZ40/Mac-connect/main/provider-presets.json"
 
 # [[providers]]
 # name = "anthropic"

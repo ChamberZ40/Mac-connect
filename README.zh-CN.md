@@ -346,5 +346,8 @@ go build -tags 'no_weixin no_wecom' ./cmd/cc-connect   # 不用 Make
 
 ## 许可
 
-上游 [chenhg5/cc-connect](https://github.com/chenhg5/cc-connect) 以 MIT 许可发布。
-本仓库尚未包含 `LICENSE` 文件——对外分发前请先补上。
+[MIT](LICENSE) —— 随便用，商用也行，唯一的条件是保留版权与许可声明。
+
+上游 [chenhg5/cc-connect](https://github.com/chenhg5/cc-connect) 在
+`npm/package.json` 里声明了 MIT，但仓库里没有 `LICENSE` 文件，所以
+[LICENSE](LICENSE) 同时带上了它和本 fork 的版权声明。
