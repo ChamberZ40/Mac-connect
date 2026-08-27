@@ -3,7 +3,13 @@ MODULE     := github.com/chenhg5/cc-connect
 CMD        := ./cmd/cc-connect
 DIST       := dist
 
-VERSION := v1.3.3
+# Stamped with SemVer build metadata (SemVer 2.0 §10: no precedence, must parse)
+# so this trimmed fork compares *equal* to the upstream v1.5.0 line rather than
+# below it. `git describe` here yields v1.3.3-110-g<sha>, which SemVer orders as a
+# prerelease of v1.3.3 — i.e. behind a tag this tree is 110 commits ahead of — and
+# `cc-connect update` would offer that as an "upgrade" and overwrite this build
+# with the full upstream one. Override on the command line for release builds.
+VERSION := v1.5.0+trim.1
 COMMIT     := $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
 BUILD_TIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 
