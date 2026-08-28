@@ -139,7 +139,6 @@ level = "info" # debug, info, warn, error
 #                                # 省略。
 # hide_agent_footer = false      # Strip standalone model/token footer lines emitted by agents (default: false)
 #                                # 过滤 agent 自己混入正文的模型/token 统计 footer 行（默认 false 不过滤）
-# promote_agent_footer = false   # Move a trailing "─ …" line from the reply body into the status footer
 #                                # block, so agent-authored metadata (elapsed, tool counts, files touched)
 #                                # renders as small/dim text below the divider instead of inside the body.
 #                                # Only the last line is considered, and only when it starts with "─" or "—".

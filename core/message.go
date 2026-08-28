@@ -434,8 +434,6 @@ type Event struct {
 	Content                  string
 	ToolName                 string         // populated for EventToolUse, EventPermissionRequest
 	ToolInput                string         // human-readable summary of tool input
-	ToolDescription          string         // optional agent-authored intent of the call ("List files in current directory")
-	ToolID                   string         // optional agent-side call id, correlating EventToolResult with its EventToolUse
 	ToolInputRaw             map[string]any // raw tool input (for EventPermissionRequest, used in allow response)
 	ToolResult               string         // populated for EventToolResult
 	ToolStatus               string         // optional status for EventToolResult (e.g. completed/failed)

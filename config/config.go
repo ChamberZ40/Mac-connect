@@ -202,7 +202,6 @@ type DisplayConfig struct {
 	ShowContextIndicator *bool   `toml:"show_context_indicator"` // whether [ctx: ~N%] suffix is shown; default true
 	ReplyFooter          *bool   `toml:"reply_footer"`           // whether Codex-like footer is shown; default true
 	HideAgentFooter      *bool   `toml:"hide_agent_footer"`      // strip agent-emitted model/token footer lines; default false
-	PromoteAgentFooter   *bool   `toml:"promote_agent_footer"`   // move a trailing "─ …" line from the reply body into the status footer; default false
 }
 
 // StreamPreviewConfig controls real-time streaming preview in IM.
@@ -991,27 +990,6 @@ func EffectiveCardMode(cfg *Config, proj *ProjectConfig) string {
 		}
 	}
 	return "legacy"
-}
-
-// EffectivePromoteAgentFooter reports whether a trailing "─ …" line in the
-// agent's reply should be moved out of the message body and into the status
-// footer. Per-project [projects.display] overrides global [display];
-// default false (leave agent output untouched).
-//
-// Kept as its own resolver rather than another EffectiveDisplay return value —
-// that signature is already at eight results.
-func EffectivePromoteAgentFooter(cfg *Config, proj *ProjectConfig) bool {
-	var projDisp *DisplayConfig
-	if proj != nil {
-		projDisp = proj.Display
-	}
-	if projDisp != nil && projDisp.PromoteAgentFooter != nil {
-		return *projDisp.PromoteAgentFooter
-	}
-	if cfg.Display.PromoteAgentFooter != nil {
-		return *cfg.Display.PromoteAgentFooter
-	}
-	return false
 }
 
 // validatePermissive is like validate but skips the "at least one platform"

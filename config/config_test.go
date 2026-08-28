@@ -521,57 +521,6 @@ func TestEffectiveDisplayHideAgentFooter(t *testing.T) {
 	}
 }
 
-func TestEffectivePromoteAgentFooter(t *testing.T) {
-	tru := true
-	fal := false
-
-	tests := []struct {
-		name string
-		cfg  Config
-		proj *ProjectConfig
-		want bool
-	}{
-		{
-			name: "default false",
-			cfg:  Config{},
-			proj: &ProjectConfig{},
-			want: false,
-		},
-		{
-			name: "global true",
-			cfg:  Config{Display: DisplayConfig{PromoteAgentFooter: &tru}},
-			proj: &ProjectConfig{},
-			want: true,
-		},
-		{
-			name: "project overrides global",
-			cfg:  Config{Display: DisplayConfig{PromoteAgentFooter: &tru}},
-			proj: &ProjectConfig{Display: &DisplayConfig{PromoteAgentFooter: &fal}},
-			want: false,
-		},
-		{
-			name: "project enables without global",
-			cfg:  Config{},
-			proj: &ProjectConfig{Display: &DisplayConfig{PromoteAgentFooter: &tru}},
-			want: true,
-		},
-		{
-			name: "nil project falls back to global",
-			cfg:  Config{Display: DisplayConfig{PromoteAgentFooter: &tru}},
-			proj: nil,
-			want: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := EffectivePromoteAgentFooter(&tt.cfg, tt.proj); got != tt.want {
-				t.Fatalf("promoteAgentFooter = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestValidateProjectDisplayConfig(t *testing.T) {
 	mode := "verbose"
 	cardMode := "modern"

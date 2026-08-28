@@ -170,11 +170,6 @@ type Platform struct {
 	// stale entries can be expired by a future TTL sweep if needed.
 	activeThreadSessions sync.Map // sessionKey -> time.Time
 
-	// richCardLangCode is the UI language the engine last handed us via
-	// SetRichCardLang, used to localize rich-card panel chrome. Guarded by mu
-	// because the engine writes it from its event loop while card builds read it.
-	richCardLangCode string
-
 	richCardImageMu         sync.Mutex
 	richCardImageResolved   map[string]string
 	richCardImagePending    map[string]*richCardImageUpload
@@ -5537,7 +5532,7 @@ func buildToolDisplay(toolName, detail string) toolDisplay {
 }
 
 func classifyCommandToolDetail(detail string) (title, icon string, ok bool) {
-	command := strings.ToLower(commandClassificationTarget(detail))
+	command := strings.ToLower(strings.TrimSpace(stripToolDisplayQuotes(detail)))
 	if command == "" {
 		return "", "", false
 	}
@@ -5575,56 +5570,6 @@ func classifyCommandToolDetail(detail string) (title, icon string, ok bool) {
 		return "Wait", "alarm-clock_outlined", true
 	}
 	return "", "", false
-}
-
-// commandSegmentSepRe splits a shell command into sequentially-run segments.
-// Pipes are deliberately absent: `cat x | grep y` is one command whose head
-// carries the intent.
-var commandSegmentSepRe = regexp.MustCompile(`&&|\|\||;|\n`)
-
-// commandSetupHeads are the commands a script opens with to arrange its
-// environment rather than to do work.
-var commandSetupHeads = map[string]struct{}{
-	"cd": {}, "export": {}, "source": {}, ".": {},
-	"set": {}, "unset": {}, "pushd": {}, "popd": {}, "umask": {},
-}
-
-var envAssignRe = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*=`)
-
-// commandClassificationTarget picks the first segment of a shell command that
-// says something about intent. Multi-line scripts routinely open with
-// `cd /tmp/work` or an env assignment; classifying on that labels unrelated
-// calls identically and is what made every step read "cd /tmp/fdework".
-//
-// Falls back to the whole command when every segment is setup.
-func commandClassificationTarget(detail string) string {
-	command := strings.TrimSpace(stripToolDisplayQuotes(detail))
-	if command == "" {
-		return ""
-	}
-	for _, segment := range commandSegmentSepRe.Split(command, -1) {
-		if intent := commandSegmentIntent(segment); intent != "" {
-			return intent
-		}
-	}
-	return command
-}
-
-// commandSegmentIntent strips a segment's leading env assignments
-// (`CGO_ENABLED=0 go build`) and reports what remains, or "" when the segment
-// only arranges the environment.
-func commandSegmentIntent(segment string) string {
-	fields := strings.Fields(segment)
-	for len(fields) > 0 && envAssignRe.MatchString(fields[0]) {
-		fields = fields[1:]
-	}
-	if len(fields) == 0 {
-		return ""
-	}
-	if _, isSetup := commandSetupHeads[strings.ToLower(fields[0])]; isSetup {
-		return ""
-	}
-	return strings.Join(fields, " ")
 }
 
 func commandHasAnyPrefix(command string, prefixes ...string) bool {
@@ -5693,13 +5638,6 @@ func extractToolDetailFromSummary(text string, desc toolDescriptor) string {
 	if text == "" {
 		return ""
 	}
-	// A shell script's meaning lives past its first line: scripts open with
-	// `cd /tmp/work` or an env assignment, so reducing one to its head both
-	// mislabels the call and hides what it actually did. Hand the whole script
-	// to the sanitizer and let renderers shorten it.
-	if desc.Sanitizer == toolSanitizerCommand && strings.Contains(text, "\n") {
-		return ""
-	}
 	for _, line := range strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n") {
 		line = strings.TrimSpace(stripToolDisplayMarkdown(line))
 		if line == "" {
@@ -5739,17 +5677,9 @@ var (
 	firstURLRe        = regexp.MustCompile(`https?://[^\s'"` + "`" + `<>]+`)
 	firstCodeSpanRe   = regexp.MustCompile("`([^`]+)`")
 	firstQuotedTextRe = regexp.MustCompile(`"([^"]+)"|'([^']+)'`)
-	secretAssignRe    = regexp.MustCompile(`\b([A-Za-z_][A-Za-z0-9_]*)=("[^"]*"|'[^']*'|[^\s"'` + "`" + `]+)`)
+	secretAssignRe    = regexp.MustCompile(`(?i)\b([A-Za-z_][A-Za-z0-9_]*(?:token|secret|password|api[_-]?key|authorization|cookie|credential|bearer|session[_-]?id|client[_-]?secret|access[_-]?key)[A-Za-z0-9_]*)=("[^"]*"|'[^']*'|[^\s"'` + "`" + `]+)`)
 	authHeaderRe      = regexp.MustCompile(`(?i)(Authorization\s*:\s*(?:Bearer|Basic|Token)\s+)([^\s'"` + "`" + `]+)`)
 	sensitiveNameRe   = regexp.MustCompile(`(?i)(token|secret|password|api[_-]?key|authorization|cookie|credential|bearer|session[_-]?id|client[_-]?secret|access[_-]?key)`)
-
-	// shellIndirectionRe matches a value that only *points at* a secret:
-	// `$(cmd …)`, `${VAR}`, `$VAR` or a backtick substitution. Redacting one of
-	// these hides nothing — and because the regex stops at the first space, it
-	// also amputated the rest of the command, turning
-	// `Bearer $(lark-cli --profile dev token)` into
-	// `Bearer [redacted] --profile dev token)`.
-	shellIndirectionRe = regexp.MustCompile("^(?:\\$\\(|\\$\\{|\\$[A-Za-z_]|`)")
 )
 
 func extractFirstURL(text string) string {
@@ -5840,38 +5770,10 @@ func sanitizeCommandLike(value string) string {
 	return redactInlineSecrets(value)
 }
 
-// redactInlineSecrets hides secrets that are spelled out in a command while
-// leaving references to them alone: `$(vault read …)` and `$TOKEN` expose
-// nothing, so replacing them costs readability and buys no safety.
 func redactInlineSecrets(value string) string {
-	value = secretAssignRe.ReplaceAllStringFunc(value, func(match string) string {
-		groups := secretAssignRe.FindStringSubmatch(match)
-		if len(groups) < 3 {
-			return match
-		}
-		name, assigned := groups[1], groups[2]
-		if !sensitiveNameRe.MatchString(name) || isShellIndirection(assigned) {
-			return match
-		}
-		return name + "=[redacted]"
-	})
-	value = authHeaderRe.ReplaceAllStringFunc(value, func(match string) string {
-		groups := authHeaderRe.FindStringSubmatch(match)
-		if len(groups) < 3 {
-			return match
-		}
-		if isShellIndirection(groups[2]) {
-			return match
-		}
-		return groups[1] + "[redacted]"
-	})
+	value = secretAssignRe.ReplaceAllString(value, "$1=[redacted]")
+	value = authHeaderRe.ReplaceAllString(value, "$1[redacted]")
 	return value
-}
-
-// isShellIndirection reports whether a value merely points at a secret rather
-// than containing one.
-func isShellIndirection(value string) bool {
-	return shellIndirectionRe.MatchString(stripToolDisplayQuotes(strings.TrimSpace(value)))
 }
 
 func isSkillPathValue(value string) bool {
@@ -6410,11 +6312,37 @@ func richStepDisplayName(step core.ToolStep) string {
 }
 
 func richStepBody(step core.ToolStep) string {
+	name := richStepDisplayName(step)
 	summary := buildToolDisplay(step.Name, step.Summary).Detail
 	if summary == "" {
-		summary = richStepDisplayName(step)
+		summary = name
 	}
-	return summary
+	if step.Kind == core.ToolStepKindThinking {
+		return summary
+	}
+
+	lines := []string{summary}
+	var statusParts []string
+	status := strings.TrimSpace(step.Status)
+	if status != "" {
+		statusParts = append(statusParts, "status: "+status)
+	} else if step.Success != nil {
+		if *step.Success {
+			statusParts = append(statusParts, "status: ok")
+		} else {
+			statusParts = append(statusParts, "status: failed")
+		}
+	}
+	if step.ExitCode != nil {
+		statusParts = append(statusParts, fmt.Sprintf("exit: %d", *step.ExitCode))
+	}
+	if len(statusParts) > 0 {
+		lines = append(lines, strings.Join(statusParts, " | "))
+	}
+	if result := strings.TrimSpace(step.Result); result != "" {
+		lines = append(lines, result)
+	}
+	return strings.Join(lines, "\n")
 }
 
 // isCardJSON returns true if content looks like a complete Feishu card JSON
@@ -6479,27 +6407,22 @@ func richLaneTitle(label string, count int) string {
 	return label
 }
 
-// richStepRowContent renders one progress row. Reasoning rows stay a single
-// block of text; tool rows get the headline / argument / result layout built in
-// rich_tool_panel.go.
-func richStepRowContent(step core.ToolStep, lang string) string {
+func richStepRowContent(step core.ToolStep) string {
+	body := richStepBody(step)
 	if step.Kind == core.ToolStepKindThinking {
-		return richStepBody(step)
+		return body
 	}
-	lines := []string{richToolStepHeadline(step)}
-	if detail := richToolStepDetail(step, lang); detail != "" && detail != richStepDisplayName(step) {
-		lines = append(lines, detail)
+	name := richStepDisplayName(step)
+	if body == name || strings.HasPrefix(body, name+"\n") {
+		return body
 	}
-	if block := richToolResultBlock(step); block != "" {
-		lines = append(lines, block)
-	}
-	return strings.Join(lines, "\n")
+	return name + "\n" + body
 }
 
-func richStepElement(step core.ToolStep, lang string) map[string]any {
+func richStepElement(step core.ToolStep) map[string]any {
 	text := map[string]any{
 		"tag":       "plain_text",
-		"content":   richStepRowContent(step, lang),
+		"content":   richStepRowContent(step),
 		"text_size": "notation",
 	}
 	elem := map[string]any{
@@ -6527,7 +6450,7 @@ func richPlaceholderElement(text string) map[string]any {
 	}
 }
 
-func richPanelElements(steps []core.ToolStep, emptyText, lang string) []map[string]any {
+func richPanelElements(steps []core.ToolStep, emptyText string) []map[string]any {
 	if len(steps) == 0 {
 		return []map[string]any{richPlaceholderElement(emptyText)}
 	}
@@ -6543,7 +6466,7 @@ func richPanelElements(steps []core.ToolStep, emptyText, lang string) []map[stri
 		elements = append(elements, richPlaceholderElement(fmt.Sprintf("... %d earlier steps hidden", hidden)))
 	}
 	for _, step := range visible {
-		elements = append(elements, richStepElement(step, lang))
+		elements = append(elements, richStepElement(step))
 	}
 	return elements
 }
@@ -6568,12 +6491,8 @@ const maxRichCardJSONBytes = 28000
 // buildRichCard renders a Card 2.0 "single-card" turn with collapsible
 // reasoning/tool panels, streaming markdown body, status-colored header, and a
 // pre-composed multi-line statusFooter (engine-owned, includes elapsed).
-//
-// lang localizes the panel chrome the platform owns (see richToolsLaneTitle);
-// "" renders it in English.
-func buildRichCard(status core.CardStatus, lang string, steps []core.ToolStep, markdown string, streaming bool, statusFooter string) string {
-	totals := richLaneTotalsFor(steps)
-	b, err := buildRichCardJSONBytes(status, lang, steps, markdown, streaming, statusFooter, totals)
+func buildRichCard(status core.CardStatus, _ string, steps []core.ToolStep, markdown string, streaming bool, statusFooter string) string {
+	b, err := buildRichCardJSONBytes(status, steps, markdown, streaming, statusFooter)
 	if err != nil {
 		slog.Debug("feishu: build rich card marshal failed, fallback to basic card", "error", err)
 		return buildCardJSONWithStatus(markdown, status)
@@ -6595,7 +6514,7 @@ func buildRichCard(status core.CardStatus, lang string, steps []core.ToolStep, m
 		{perLane: 3, textLen: 80},
 	} {
 		compactSteps := compactRichStepsForCardSize(steps, limit.perLane, limit.textLen)
-		compact, err := buildRichCardJSONBytes(status, lang, compactSteps, markdown, streaming, statusFooter, totals)
+		compact, err := buildRichCardJSONBytes(status, compactSteps, markdown, streaming, statusFooter)
 		if err == nil && len(compact) <= maxRichCardJSONBytes {
 			slog.Debug("feishu: rich card exceeded size limit, compacted panels",
 				"original_size", len(b),
@@ -6609,31 +6528,31 @@ func buildRichCard(status core.CardStatus, lang string, steps []core.ToolStep, m
 
 	fallbackMarkdown := markdown
 	if strings.TrimSpace(fallbackMarkdown) == "" {
-		fallbackMarkdown = compactRichFallbackMarkdown(steps, lang)
+		fallbackMarkdown = compactRichFallbackMarkdown(steps)
 	}
 	slog.Debug("feishu: rich card exceeds size limit, fallback to compact markdown card", "size", len(b))
 	return buildCardJSONWithStatus(fallbackMarkdown, status)
 }
 
-func buildRichCardJSONBytes(status core.CardStatus, lang string, steps []core.ToolStep, markdown string, streaming bool, statusFooter string, totals richLaneTotals) ([]byte, error) {
+func buildRichCardJSONBytes(status core.CardStatus, steps []core.ToolStep, markdown string, streaming bool, statusFooter string) ([]byte, error) {
 	reasoningSteps, toolSteps := splitRichStepsByLane(steps)
 	panelMaps := make([]map[string]any, 0, 2)
 	if len(reasoningSteps) > 0 {
 		panelMaps = append(panelMaps, buildRichPanel(
-			richLaneTitle("Reasoning", totals.reasoning),
+			richLaneTitle("Reasoning", len(reasoningSteps)),
 			streaming,
-			richPanelElements(reasoningSteps, "Thinking...", lang),
+			richPanelElements(reasoningSteps, "Thinking..."),
 		))
 	}
 	if len(toolSteps) > 0 {
 		panelMaps = append(panelMaps, buildRichPanel(
-			richToolsLaneTitleFor(totals.tools, totals.toolSpan, lang),
+			richLaneTitle("Tools", len(toolSteps)),
 			streaming,
-			richPanelElements(toolSteps, "No tool steps", lang),
+			richPanelElements(toolSteps, "No tool steps"),
 		))
 	}
 	if len(panelMaps) == 0 && streaming {
-		panelMaps = append(panelMaps, buildRichPanel("Reasoning", true, richPanelElements(nil, "Thinking...", lang)))
+		panelMaps = append(panelMaps, buildRichPanel("Reasoning", true, richPanelElements(nil, "Thinking...")))
 	}
 
 	markdownMap := map[string]any{
@@ -6751,14 +6670,14 @@ func compactRichText(s string, maxRunes int) string {
 	return string(rs[:maxRunes]) + "..."
 }
 
-func compactRichFallbackMarkdown(steps []core.ToolStep, lang string) string {
+func compactRichFallbackMarkdown(steps []core.ToolStep) string {
 	compactSteps := compactRichStepsForCardSize(steps, 3, 120)
 	if len(compactSteps) == 0 {
 		return ""
 	}
 	lines := []string{"Card content is large; showing recent activity:"}
 	for _, step := range compactSteps {
-		line := strings.TrimSpace(richStepRowContent(step, lang))
+		line := strings.TrimSpace(richStepRowContent(step))
 		if line == "" {
 			continue
 		}
@@ -6797,25 +6716,8 @@ func splitMarkdownByTables(md string, maxTables int) []string {
 // BuildRichCard implements core.RichCardSupporter. The engine pre-composes
 // statusFooter (multi-line, '\n'-separated) and passes it through; the renderer
 // splits it back into one dim notation block per line.
-//
-// title is unused: the card header shows a status word, not a turn title. Panel
-// chrome is localized from the language the engine last handed us via
-// SetRichCardLang.
-func (p *Platform) BuildRichCard(status core.CardStatus, _ string, steps []core.ToolStep, markdown string, streaming bool, statusFooter string) string {
-	return buildRichCard(status, p.richCardLang(), steps, markdown, streaming, statusFooter)
-}
-
-// SetRichCardLang implements core.RichCardLocalizer.
-func (p *Platform) SetRichCardLang(lang string) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.richCardLangCode = strings.TrimSpace(lang)
-}
-
-func (p *Platform) richCardLang() string {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return p.richCardLangCode
+func (p *Platform) BuildRichCard(status core.CardStatus, title string, steps []core.ToolStep, markdown string, streaming bool, statusFooter string) string {
+	return buildRichCard(status, title, steps, markdown, streaming, statusFooter)
 }
 
 // SplitMarkdownByTables implements core.MarkdownTableSplitter.

@@ -1157,16 +1157,9 @@ func TestBuildRichCard_RendersThinkingAndToolResultRows(t *testing.T) {
 		},
 	}, "done", true, "")
 
-	for _, want := range []string{"Inspecting event routing", "echo hi", "Succeeded", "Result", "hi"} {
+	for _, want := range []string{"Inspecting event routing", "echo hi", "completed", "exit: 0", "hi"} {
 		if !strings.Contains(cardJSON, want) {
 			t.Fatalf("rich card should contain %q, got %q", want, cardJSON)
-		}
-	}
-	// A successful call reports only its status word: "exit: 0" is noise, and the
-	// raw status string the agent sent is not what the reader needs to see.
-	for _, unwanted := range []string{"exit: 0", "status: completed"} {
-		if strings.Contains(cardJSON, unwanted) {
-			t.Fatalf("rich card should not contain %q, got %q", unwanted, cardJSON)
 		}
 	}
 	if strings.Contains(cardJSON, core.ProgressCardPayloadPrefix) {
