@@ -1212,7 +1212,7 @@ func (e *Engine) SetAdminFrom(adminFrom string) {
 	shellDisabled := e.disabledCmds["shell"]
 	e.userRolesMu.Unlock()
 	if af == "" && !shellDisabled {
-		slog.Warn("admin_from is not set — privileged commands (/shell, /show, /dir, /restart, /upgrade) are blocked. "+
+		slog.Warn("admin_from is not set — privileged commands (/shell, /show, /dir, /restart) are blocked. "+
 			"Set admin_from in config to enable them, or use disabled_commands to hide them.",
 			"project", e.name)
 	}
@@ -1224,7 +1224,6 @@ var privilegedCommands = map[string]bool{
 	"show":    true,
 	"dir":     true,
 	"restart": true,
-	"upgrade": true,
 	"web":     true,
 	"diff":    true,
 }
@@ -6433,7 +6432,6 @@ var builtinCommands = []struct {
 	{[]string{"skills", "skill"}, "skills"},
 	{[]string{"config"}, "config"},
 	{[]string{"doctor"}, "doctor"},
-	{[]string{"upgrade", "update"}, "upgrade"},
 	{[]string{"restart"}, "restart"},
 	{[]string{"alias"}, "alias"},
 	{[]string{"delete", "del", "rm"}, "delete"},
@@ -6662,8 +6660,6 @@ func (e *Engine) handleCommand(p Platform, msg *Message, raw string) bool {
 		e.cmdConfig(p, msg, args)
 	case "doctor":
 		e.cmdDoctor(p, msg)
-	case "upgrade":
-		e.cmdUpgrade(p, msg, args)
 	case "restart":
 		e.cmdRestart(p, msg)
 	case "alias":
@@ -9394,7 +9390,6 @@ func helpCardGroups() []helpCardGroup {
 				{command: "/workspace", action: "cmd:/workspace"},
 				{command: "/dir", action: "nav:/dir"},
 				{command: "/version", action: "nav:/version"},
-				{command: "/upgrade", action: "nav:/upgrade"},
 				{command: "/restart", action: "cmd:/restart"},
 			},
 		},
@@ -12056,8 +12051,6 @@ func (e *Engine) handleCardNav(action string, sessionKey string) *Card {
 		return e.renderDeleteModeCard(sessionKey)
 	case "/stop":
 		return e.renderStatusCard(sessionKey, extractUserID(sessionKey))
-	case "/upgrade":
-		return e.renderUpgradeCard()
 	}
 	return nil
 }
@@ -13758,49 +13751,6 @@ func (e *Engine) renderVersionCard() *Card {
 		Build()
 }
 
-func (e *Engine) renderUpgradeCard() *Card {
-	title := e.i18n.T(MsgCardTitleUpgrade)
-	cur := CurrentVersion
-	if cur == "" || cur == "dev" {
-		return e.simpleCard(title, "grey", e.i18n.T(MsgUpgradeDevBuild))
-	}
-
-	type result struct {
-		release *ReleaseInfo
-		err     error
-	}
-	ch := make(chan result, 1)
-	useGitee := e.i18n.IsZhLike()
-	go func() {
-		r, err := CheckForUpdate(cur, useGitee)
-		ch <- result{r, err}
-	}()
-
-	var content string
-	select {
-	case res := <-ch:
-		if res.err != nil {
-			content = e.i18n.Tf(MsgError, res.err)
-		} else if res.release == nil {
-			content = fmt.Sprintf(e.i18n.T(MsgUpgradeUpToDate), cur)
-		} else {
-			body := res.release.Body
-			if len([]rune(body)) > 300 {
-				body = string([]rune(body)[:300]) + "…"
-			}
-			content = fmt.Sprintf(e.i18n.T(MsgUpgradeAvailable), cur, res.release.TagName, body)
-		}
-	case <-time.After(8 * time.Second):
-		content = "⏱ " + e.i18n.T(MsgUpgradeChecking) + e.i18n.T(MsgUpgradeTimeoutSuffix)
-	}
-
-	return NewCard().
-		Title(title, "grey").
-		Markdown(content).
-		Buttons(e.cardBackButton()).
-		Build()
-}
-
 // ──────────────────────────────────────────────────────────────
 // /memory command
 // ──────────────────────────────────────────────────────────────
@@ -15187,82 +15137,6 @@ func (e *Engine) cmdDoctor(p Platform, msg *Message) {
 	results := RunDoctorChecks(e.ctx, e.agent, e.platforms)
 	report := FormatDoctorResults(results, e.i18n)
 	e.reply(p, msg.ReplyCtx, report)
-}
-
-func (e *Engine) cmdUpgrade(p Platform, msg *Message, args []string) {
-	subCmd := ""
-	if len(args) > 0 {
-		subCmd = matchSubCommand(args[0], []string{"confirm", "check"})
-	}
-
-	if subCmd == "confirm" {
-		e.cmdUpgradeConfirm(p, msg)
-		return
-	}
-
-	// Default: check for updates
-	e.reply(p, msg.ReplyCtx, e.i18n.T(MsgUpgradeChecking))
-
-	cur := CurrentVersion
-	if cur == "" || cur == "dev" {
-		e.reply(p, msg.ReplyCtx, e.i18n.T(MsgUpgradeDevBuild))
-		return
-	}
-
-	useGitee := e.i18n.IsZhLike()
-	release, err := CheckForUpdate(cur, useGitee)
-	if err != nil {
-		e.reply(p, msg.ReplyCtx, e.i18n.Tf(MsgError, err))
-		return
-	}
-	if release == nil {
-		e.reply(p, msg.ReplyCtx, fmt.Sprintf(e.i18n.T(MsgUpgradeUpToDate), cur))
-		return
-	}
-
-	body := release.Body
-	if len([]rune(body)) > 300 {
-		body = string([]rune(body)[:300]) + "…"
-	}
-
-	e.reply(p, msg.ReplyCtx, fmt.Sprintf(e.i18n.T(MsgUpgradeAvailable), cur, release.TagName, body))
-}
-
-func (e *Engine) cmdUpgradeConfirm(p Platform, msg *Message) {
-	cur := CurrentVersion
-	if cur == "" || cur == "dev" {
-		e.reply(p, msg.ReplyCtx, e.i18n.T(MsgUpgradeDevBuild))
-		return
-	}
-
-	useGitee := e.i18n.IsZhLike()
-	release, err := CheckForUpdate(cur, useGitee)
-	if err != nil {
-		e.reply(p, msg.ReplyCtx, e.i18n.Tf(MsgError, err))
-		return
-	}
-	if release == nil {
-		e.reply(p, msg.ReplyCtx, fmt.Sprintf(e.i18n.T(MsgUpgradeUpToDate), cur))
-		return
-	}
-
-	e.reply(p, msg.ReplyCtx, fmt.Sprintf(e.i18n.T(MsgUpgradeDownloading), release.TagName))
-
-	if err := SelfUpdate(release.TagName, useGitee); err != nil {
-		e.reply(p, msg.ReplyCtx, e.i18n.Tf(MsgError, err))
-		return
-	}
-
-	e.reply(p, msg.ReplyCtx, fmt.Sprintf(e.i18n.T(MsgUpgradeSuccess), release.TagName))
-
-	// Auto-restart to apply the update
-	select {
-	case RestartCh <- RestartRequest{
-		SessionKey: msg.SessionKey,
-		Platform:   p.Name(),
-	}:
-	default:
-	}
 }
 
 func (e *Engine) cmdConfigReload(p Platform, msg *Message) {

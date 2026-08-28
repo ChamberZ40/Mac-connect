@@ -374,37 +374,35 @@ const (
 	MsgCardTitleSkills           MsgKey = "card_title_skills"
 	MsgCardTitleDoctor           MsgKey = "card_title_doctor"
 	MsgCardTitleVersion          MsgKey = "card_title_version"
-	MsgCardTitleUpgrade          MsgKey = "card_title_upgrade"
 	MsgListItem                  MsgKey = "list_item"
 	MsgListEmptySummary          MsgKey = "list_empty_summary"
 	MsgCronIDLabel               MsgKey = "cron_id_label"
 	MsgCronFailedSuffix          MsgKey = "cron_failed_suffix"
 
-	MsgTimerNotAvailable  MsgKey = "timer_not_available"
-	MsgTimerUsage         MsgKey = "timer_usage"
-	MsgTimerAddUsage      MsgKey = "timer_add_usage"
-	MsgTimerAdded         MsgKey = "timer_added"
-	MsgTimerAddedExec     MsgKey = "timer_added_exec"
-	MsgTimerAddExecUsage  MsgKey = "timer_addexec_usage"
-	MsgTimerEmpty         MsgKey = "timer_empty"
-	MsgTimerListTitle     MsgKey = "timer_list_title"
-	MsgTimerListFooter    MsgKey = "timer_list_footer"
-	MsgTimerDelUsage      MsgKey = "timer_del_usage"
-	MsgTimerMuteUsage     MsgKey = "timer_mute_usage"
-	MsgTimerDeleted       MsgKey = "timer_deleted"
-	MsgTimerNotFound      MsgKey = "timer_not_found"
-	MsgTimerMuted         MsgKey = "timer_muted"
-	MsgTimerUnmuted       MsgKey = "timer_unmuted"
-	MsgTimerCardHint      MsgKey = "timer_card_hint"
-	MsgTimerBtnMute       MsgKey = "timer_btn_mute"
-	MsgTimerBtnUnmute     MsgKey = "timer_btn_unmute"
-	MsgTimerBtnDelete     MsgKey = "timer_btn_delete"
-	MsgTimerIDLabel       MsgKey = "timer_id_label"
+	MsgTimerNotAvailable   MsgKey = "timer_not_available"
+	MsgTimerUsage          MsgKey = "timer_usage"
+	MsgTimerAddUsage       MsgKey = "timer_add_usage"
+	MsgTimerAdded          MsgKey = "timer_added"
+	MsgTimerAddedExec      MsgKey = "timer_added_exec"
+	MsgTimerAddExecUsage   MsgKey = "timer_addexec_usage"
+	MsgTimerEmpty          MsgKey = "timer_empty"
+	MsgTimerListTitle      MsgKey = "timer_list_title"
+	MsgTimerListFooter     MsgKey = "timer_list_footer"
+	MsgTimerDelUsage       MsgKey = "timer_del_usage"
+	MsgTimerMuteUsage      MsgKey = "timer_mute_usage"
+	MsgTimerDeleted        MsgKey = "timer_deleted"
+	MsgTimerNotFound       MsgKey = "timer_not_found"
+	MsgTimerMuted          MsgKey = "timer_muted"
+	MsgTimerUnmuted        MsgKey = "timer_unmuted"
+	MsgTimerCardHint       MsgKey = "timer_card_hint"
+	MsgTimerBtnMute        MsgKey = "timer_btn_mute"
+	MsgTimerBtnUnmute      MsgKey = "timer_btn_unmute"
+	MsgTimerBtnDelete      MsgKey = "timer_btn_delete"
+	MsgTimerIDLabel        MsgKey = "timer_id_label"
 	MsgTimerScheduledLabel MsgKey = "timer_scheduled_label"
-	MsgTimerFailedSuffix  MsgKey = "timer_failed_suffix"
-	MsgCommandsTagAgent          MsgKey = "commands_tag_agent"
-	MsgCommandsTagShell          MsgKey = "commands_tag_shell"
-	MsgUpgradeTimeoutSuffix      MsgKey = "upgrade_timeout_suffix"
+	MsgTimerFailedSuffix   MsgKey = "timer_failed_suffix"
+	MsgCommandsTagAgent    MsgKey = "commands_tag_agent"
+	MsgCommandsTagShell    MsgKey = "commands_tag_shell"
 
 	MsgCronScheduleLabel MsgKey = "cron_schedule_label"
 	MsgCronNextRunLabel  MsgKey = "cron_next_run_label"
@@ -460,13 +458,6 @@ const (
 
 	MsgRestarting     MsgKey = "restarting"
 	MsgRestartSuccess MsgKey = "restart_success"
-
-	MsgUpgradeChecking    MsgKey = "upgrade_checking"
-	MsgUpgradeUpToDate    MsgKey = "upgrade_up_to_date"
-	MsgUpgradeAvailable   MsgKey = "upgrade_available"
-	MsgUpgradeDownloading MsgKey = "upgrade_downloading"
-	MsgUpgradeSuccess     MsgKey = "upgrade_success"
-	MsgUpgradeDevBuild    MsgKey = "upgrade_dev_build"
 
 	MsgWebNotSupported MsgKey = "web_not_supported"
 	MsgWebNotEnabled   MsgKey = "web_not_enabled"
@@ -574,7 +565,6 @@ const (
 	MsgBuiltinCmdSkills    MsgKey = "skills"
 	MsgBuiltinCmdConfig    MsgKey = "config"
 	MsgBuiltinCmdDoctor    MsgKey = "doctor"
-	MsgBuiltinCmdUpgrade   MsgKey = "upgrade"
 	MsgBuiltinCmdRestart   MsgKey = "restart"
 	MsgBuiltinCmdStatus    MsgKey = "status"
 	MsgBuiltinCmdUsage     MsgKey = "usage"
@@ -1011,7 +1001,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/workspace [init]\n  Manage workspace\n\n" +
 			"/doctor\n  Run system diagnostics\n\n" +
 			"/usage\n  Show account/model quota usage\n\n" +
-			"/upgrade\n  Check for updates and self-update\n\n" +
 			"/restart\n  Restart cc-connect service\n\n" +
 			"/status\n  Show system status\n\n" +
 			"/version\n  Show cc-connect version\n\n" +
@@ -1055,7 +1044,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/workspace [init]\n  管理工作区\n\n" +
 			"/doctor\n  运行系统诊断\n\n" +
 			"/usage\n  查看账号/模型限额使用情况\n\n" +
-			"/upgrade\n  检查更新并自动升级\n\n" +
 			"/restart\n  重启 cc-connect 服务\n\n" +
 			"/status\n  查看系统状态\n\n" +
 			"/version\n  查看 cc-connect 版本\n\n" +
@@ -1098,7 +1086,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/workspace [init]\n  管理工作區\n\n" +
 			"/doctor\n  執行系統診斷\n\n" +
 			"/usage\n  查看帳號/模型限額使用情況\n\n" +
-			"/upgrade\n  檢查更新並自動升級\n\n" +
 			"/restart\n  重啟 cc-connect 服務\n\n" +
 			"/status\n  查看系統狀態\n\n" +
 			"/version\n  查看 cc-connect 版本\n\n" +
@@ -1140,7 +1127,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/workspace [init]\n  ワークスペース管理\n\n" +
 			"/doctor\n  システム診断を実行\n\n" +
 			"/usage\n  アカウント/モデル使用量を表示\n\n" +
-			"/upgrade\n  アップデートを確認して自動更新\n\n" +
 			"/restart\n  cc-connect サービスを再起動\n\n" +
 			"/status\n  システム状態を表示\n\n" +
 			"/version\n  cc-connect のバージョンを表示\n\n" +
@@ -1182,7 +1168,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/workspace [init]\n  Gestionar workspace\n\n" +
 			"/doctor\n  Ejecutar diagnósticos del sistema\n\n" +
 			"/usage\n  Mostrar uso de cuota de cuenta/modelo\n\n" +
-			"/upgrade\n  Buscar actualizaciones y auto-actualizar\n\n" +
 			"/restart\n  Reiniciar el servicio cc-connect\n\n" +
 			"/status\n  Mostrar estado del sistema\n\n" +
 			"/version\n  Mostrar versión de cc-connect\n\n" +
@@ -1348,7 +1333,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/doctor — System diagnostics\n" +
 			"/usage — Account/model quota usage\n" +
 			"/whoami — Show your User ID\n" +
-			"/upgrade — Check for updates\n" +
 			"/restart — Restart service\n" +
 			"/status — System status\n" +
 			"/version — Show version",
@@ -1357,7 +1341,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/doctor — 系统诊断\n" +
 			"/usage — 账号/模型限额\n" +
 			"/whoami — 查看你的 User ID\n" +
-			"/upgrade — 检查更新\n" +
 			"/restart — 重启服务\n" +
 			"/status — 系统状态\n" +
 			"/version — 查看版本",
@@ -1366,7 +1349,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/doctor — 系統診斷\n" +
 			"/usage — 帳號/模型限額\n" +
 			"/whoami — 查看你的 User ID\n" +
-			"/upgrade — 檢查更新\n" +
 			"/restart — 重啟服務\n" +
 			"/status — 系統狀態\n" +
 			"/version — 查看版本",
@@ -1375,7 +1357,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/doctor — システム診断\n" +
 			"/usage — アカウント/モデル使用量\n" +
 			"/whoami — User ID を表示\n" +
-			"/upgrade — アップデート確認\n" +
 			"/restart — サービス再起動\n" +
 			"/status — システム状態\n" +
 			"/version — バージョン表示",
@@ -1384,7 +1365,6 @@ var messages = map[MsgKey]map[Language]string{
 			"/doctor — Diagnósticos del sistema\n" +
 			"/usage — Uso de cuota de cuenta/modelo\n" +
 			"/whoami — Mostrar tu User ID\n" +
-			"/upgrade — Buscar actualizaciones\n" +
 			"/restart — Reiniciar servicio\n" +
 			"/status — Estado del sistema\n" +
 			"/version — Mostrar versión",
@@ -2625,10 +2605,6 @@ var messages = map[MsgKey]map[Language]string{
 		LangEnglish: "Version", LangChinese: "版本", LangTraditionalChinese: "版本",
 		LangJapanese: "バージョン", LangSpanish: "Versión",
 	},
-	MsgCardTitleUpgrade: {
-		LangEnglish: "Upgrade", LangChinese: "升级", LangTraditionalChinese: "升級",
-		LangJapanese: "アップグレード", LangSpanish: "Actualización",
-	},
 	MsgListItem: {
 		LangEnglish:            "%s **%d.** %s · **%d** msgs · %s",
 		LangChinese:            "%s **%d.** %s · **%d** 条消息 · %s",
@@ -2655,10 +2631,6 @@ var messages = map[MsgKey]map[Language]string{
 	MsgCommandsTagShell: {
 		LangEnglish: " [shell]", LangChinese: " [终端]", LangTraditionalChinese: " [終端]",
 		LangJapanese: " [シェル]", LangSpanish: " [shell]",
-	},
-	MsgUpgradeTimeoutSuffix: {
-		LangEnglish: " (timeout)", LangChinese: "（超时）", LangTraditionalChinese: "（逾時）",
-		LangJapanese: "（タイムアウト）", LangSpanish: " (tiempo de espera agotado)",
 	},
 	MsgCronScheduleLabel: {
 		LangEnglish:            "Schedule: %s `%s`\n",
@@ -3002,68 +2974,6 @@ var messages = map[MsgKey]map[Language]string{
 		LangTraditionalChinese: "✅ cc-connect 重啟成功。",
 		LangJapanese:           "✅ cc-connect の再起動が完了しました。",
 		LangSpanish:            "✅ cc-connect se reinició correctamente.",
-	},
-	MsgUpgradeChecking: {
-		LangEnglish:            "🔍 Checking for updates...",
-		LangChinese:            "🔍 正在检查更新...",
-		LangTraditionalChinese: "🔍 正在檢查更新...",
-		LangJapanese:           "🔍 アップデートを確認中...",
-		LangSpanish:            "🔍 Buscando actualizaciones...",
-	},
-	MsgUpgradeUpToDate: {
-		LangEnglish:            "✅ Already up to date (%s)",
-		LangChinese:            "✅ 已是最新版本 (%s)",
-		LangTraditionalChinese: "✅ 已是最新版本 (%s)",
-		LangJapanese:           "✅ 最新バージョンです (%s)",
-		LangSpanish:            "✅ Ya está actualizado (%s)",
-	},
-	MsgUpgradeAvailable: {
-		LangEnglish: "🆕 New version available!\n\n\n" +
-			"Current: **%s**\n" +
-			"Latest:  **%s**\n\n\n" +
-			"%s\n\n\n" +
-			"Run `/upgrade confirm` to install.",
-		LangChinese: "🆕 发现新版本！\n\n\n" +
-			"当前版本：**%s**\n" +
-			"最新版本：**%s**\n\n\n" +
-			"%s\n\n\n" +
-			"执行 `/upgrade confirm` 进行更新。",
-		LangTraditionalChinese: "🆕 發現新版本！\n\n\n" +
-			"當前版本：**%s**\n" +
-			"最新版本：**%s**\n\n\n" +
-			"%s\n\n\n" +
-			"執行 `/upgrade confirm` 進行更新。",
-		LangJapanese: "🆕 新しいバージョンがあります！\n\n\n" +
-			"現在: **%s**\n" +
-			"最新: **%s**\n\n\n" +
-			"%s\n\n" +
-			"`/upgrade confirm` でインストール。",
-		LangSpanish: "🆕 ¡Nueva versión disponible!\n\n\n" +
-			"Actual: **%s**\n" +
-			"Última: **%s**\n\n\n" +
-			"%s\n\n\n" +
-			"Ejecute `/upgrade confirm` para instalar.",
-	},
-	MsgUpgradeDownloading: {
-		LangEnglish:            "⬇️ Downloading %s ...",
-		LangChinese:            "⬇️ 正在下载 %s ...",
-		LangTraditionalChinese: "⬇️ 正在下載 %s ...",
-		LangJapanese:           "⬇️ ダウンロード中 %s ...",
-		LangSpanish:            "⬇️ Descargando %s ...",
-	},
-	MsgUpgradeSuccess: {
-		LangEnglish:            "✅ Updated to **%s** successfully! Restarting...",
-		LangChinese:            "✅ 已成功更新到 **%s**！正在重启...",
-		LangTraditionalChinese: "✅ 已成功更新到 **%s**！正在重啟...",
-		LangJapanese:           "✅ **%s** に更新しました！再起動中...",
-		LangSpanish:            "✅ ¡Actualizado a **%s** con éxito! Reiniciando...",
-	},
-	MsgUpgradeDevBuild: {
-		LangEnglish:            "⚠️ Running a dev build — version check is not available. Please build from source or install a release version.",
-		LangChinese:            "⚠️ 当前为开发版本，无法检查更新。请从源码构建或安装正式发布版本。",
-		LangTraditionalChinese: "⚠️ 當前為開發版本，無法檢查更新。請從源碼構建或安裝正式發佈版本。",
-		LangJapanese:           "⚠️ 開発ビルドのため、バージョン確認ができません。ソースからビルドするか、リリース版をインストールしてください。",
-		LangSpanish:            "⚠️ Compilación de desarrollo — la verificación de versión no está disponible. Compile desde el código fuente o instale una versión publicada.",
 	},
 	MsgWebNotSupported: {
 		LangEnglish:            "⚠️ Web admin is not available in this build. Rebuild without the `no_web` tag to enable it.",
@@ -3723,13 +3633,6 @@ var messages = map[MsgKey]map[Language]string{
 		LangTraditionalChinese: "執行系統診斷",
 		LangJapanese:           "システム診断を実行",
 		LangSpanish:            "Ejecutar diagnósticos del sistema",
-	},
-	MsgBuiltinCmdUpgrade: {
-		LangEnglish:            "Check for updates and self-update",
-		LangChinese:            "检查更新并自动升级",
-		LangTraditionalChinese: "檢查更新並自動升級",
-		LangJapanese:           "アップデートを確認して自動更新",
-		LangSpanish:            "Buscar actualizaciones y auto-actualizar",
 	},
 	MsgBuiltinCmdRestart: {
 		LangEnglish:            "Restart cc-connect service",

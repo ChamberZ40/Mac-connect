@@ -385,7 +385,7 @@ Returns detailed information for a single project.
       "quiet": false,
       "admin_from": "user1,user2",
       "language": "en",
-      "disabled_commands": ["restart", "upgrade"]
+      "disabled_commands": ["restart", "shell"]
     }
   }
 }
@@ -413,7 +413,7 @@ Updates project settings. Only provided fields are updated.
   "quiet": true,
   "admin_from": "user1,user2,user3",
   "language": "zh",
-  "disabled_commands": ["restart", "upgrade", "cron"]
+  "disabled_commands": ["restart", "shell", "cron"]
 }
 ```
 
@@ -422,7 +422,7 @@ Updates project settings. Only provided fields are updated.
 | `quiet`             | boolean  | Suppress thinking/tool progress messages                 |
 | `admin_from`        | string   | Comma-separated user IDs for privileged commands; `"*"` = all |
 | `language`          | string   | UI language: `en`, `zh`, `zh-TW`, `ja`, `es`             |
-| `disabled_commands` | string[] | Commands to disable (e.g. `restart`, `upgrade`, `cron`)  |
+| `disabled_commands` | string[] | Commands to disable (e.g. `restart`, `shell`, `cron`)  |
 
 **Response:**
 
@@ -435,7 +435,7 @@ Updates project settings. Only provided fields are updated.
       "quiet": true,
       "admin_from": "user1,user2,user3",
       "language": "zh",
-      "disabled_commands": ["restart", "upgrade", "cron"]
+      "disabled_commands": ["restart", "shell", "cron"]
     }
   }
 }

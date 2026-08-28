@@ -104,8 +104,9 @@ npm install -g cc-connect     # any platform
 brew install cc-connect       # macOS / Linux
 ```
 
-Or build from source (Go 1.22+, plus Node.js — `make build` also rebuilds the
-embedded Web UI):
+Those two install **upstream's** build, with every agent and platform compiled
+in. To get this trimmed fork, build from source (Go 1.22+, plus Node.js —
+`make build` also rebuilds the embedded Web UI):
 
 ```bash
 git clone https://github.com/ChamberZ40/Mac-connect.git
@@ -151,20 +152,6 @@ This installs a launchd agent on macOS, a systemd unit on Linux, and a Task
 Scheduler task named `cc-connect` on Windows. On Linux, run
 `loginctl enable-linger $USER` so the unit survives logout — `daemon install`
 warns when linger is off.
-
-### Upgrade
-
-```bash
-npm install -g cc-connect     # npm
-brew upgrade cc-connect       # Homebrew
-cc-connect update             # binary self-update, stable only
-cc-connect update --pre       # include pre-releases
-```
-
-Self-update compares your build against upstream release tags. A locally built
-binary stamped with SemVer build metadata (`v1.5.0+trim.1`) compares equal to
-`v1.5.0`; a version that cannot be parsed at all makes `cc-connect update`
-refuse rather than guess, so an unknown build is never talked into a downgrade.
 
 
 ## Configure
@@ -270,7 +257,7 @@ only gates `cc-connect send`, and ordinary text replies keep working when it is
 `off`. Voice send-back uses the `[speech]` TTS config instead.
 
 If your agent does not natively inject the system prompt, run `/bind setup` (or
-`/cron setup`) once in chat after upgrading, to refresh the cc-connect
+`/cron setup`) once in chat after rebuilding, to refresh the cc-connect
 instructions in the project memory file.
 
 ### Scheduled tasks

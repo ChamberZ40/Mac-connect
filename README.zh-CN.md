@@ -99,8 +99,8 @@ npm install -g cc-connect     # 全平台
 brew install cc-connect       # macOS / Linux
 ```
 
-或者从源码构建（需要 Go 1.22+ 和 Node.js —— `make build` 会连带重新打包内嵌的
-Web UI）：
+这两条装的是**上游**的构建，所有 agent 和平台都编进去了。想要这个精简 fork，从源码
+构建（需要 Go 1.22+ 和 Node.js —— `make build` 会连带重新打包内嵌的 Web UI）：
 
 ```bash
 git clone https://github.com/ChamberZ40/Mac-connect.git
@@ -144,19 +144,6 @@ cc-connect daemon uninstall
 macOS 装的是 launchd agent，Linux 是 systemd unit，Windows 是名为 `cc-connect` 的
 计划任务。Linux 上执行 `loginctl enable-linger $USER`，让服务在你登出后继续存活
 ——linger 没开时 `daemon install` 会警告。
-
-### 升级
-
-```bash
-npm install -g cc-connect     # npm
-brew upgrade cc-connect       # Homebrew
-cc-connect update             # 二进制自更新，仅正式版
-cc-connect update --pre       # 包含预发布版
-```
-
-自更新会把你的构建和上游 release tag 做比较。带 SemVer build metadata 的本地构建
-（如 `v1.5.0+trim.1`）在优先级上等价于 `v1.5.0`；完全无法解析的版本号会让
-`cc-connect update` **拒绝执行**而不是瞎猜，所以未知构建不会被误导成降级。
 
 
 ## 配置
@@ -256,7 +243,7 @@ cc-connect send --tts "Hello from cc-connect"
 与 Agent 的 `/mode` 无关，只管 `cc-connect send`，设成 `off` 后普通文本回复照常。
 语音回传走 `[speech]` 的 TTS 配置。
 
-如果你的 Agent 不是原生注入 system prompt 的类型，升级后在聊天里执行一次
+如果你的 Agent 不是原生注入 system prompt 的类型，重新构建后在聊天里执行一次
 `/bind setup`（或 `/cron setup`），刷新项目记忆文件里的 cc-connect 说明。
 
 ### 定时任务

@@ -743,7 +743,7 @@ name = "my-backend"
 #                                   # 隐藏 footer 第一行：model · [effort ·] out/in/cw/cr · ctx %（默认 true 显示）
 # show_workdir_indicator = false   # Hide the footer's second line: workspace directory (default: true)
 #                                   # 隐藏 footer 第二行：工作区目录（默认 true 显示）
-# disabled_commands = ["restart", "upgrade", "cron"]  # Disable specific commands for this project
+# disabled_commands = ["restart", "shell", "cron"]  # Disable specific commands for this project
 #                                                     # 禁用该项目的指定命令
 #
 # filter_external_sessions: when true, /list /switch /delete only show sessions
@@ -756,8 +756,8 @@ name = "my-backend"
 # shell = "/bin/fish"                        # Per-project shell override / 项目级 shell 覆盖
 # shell_profile = "source ~/.config/fish/config.fish"  # Per-project shell profile / 项目级 shell profile
 #
-# admin_from controls who can run privileged commands (/dir, /shell, /restart, /upgrade, /commands addexec, /cron addexec).
-# admin_from 控制谁可以执行特权命令（/dir, /shell, /restart, /upgrade, /commands addexec, /cron addexec）。
+# admin_from controls who can run privileged commands (/dir, /shell, /restart, /commands addexec, /cron addexec).
+# admin_from 控制谁可以执行特权命令（/dir, /shell, /restart, /commands addexec, /cron addexec）。
 #
 # admin_from must be defined at the [[projects]] level.
 # Do NOT put it under [projects.platforms.options], or it will be ignored.

@@ -533,7 +533,7 @@ export default function ChatView() {
   };
 
   // Commands whose result should go to the message stream (they change state)
-  const chatCommands = new Set(['/new', '/stop', '/switch', '/delete-mode', '/upgrade']);
+  const chatCommands = new Set(['/new', '/stop', '/switch', '/delete-mode']);
   const knownCommands = new Set(slashCommands.map(c => c.cmd));
 
   const handleCmdSelect = useCallback((cmd: SlashCommand) => {

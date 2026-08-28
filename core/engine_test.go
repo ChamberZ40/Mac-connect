@@ -2564,10 +2564,10 @@ func TestEngine_BannedWordsEmpty(t *testing.T) {
 
 func TestEngine_DisabledCommands(t *testing.T) {
 	e := newTestEngine()
-	e.SetDisabledCommands([]string{"upgrade", "restart"})
+	e.SetDisabledCommands([]string{"shell", "restart"})
 
-	if !e.disabledCmds["upgrade"] {
-		t.Error("upgrade should be disabled")
+	if !e.disabledCmds["shell"] {
+		t.Error("shell should be disabled")
 	}
 	if !e.disabledCmds["restart"] {
 		t.Error("restart should be disabled")
@@ -2579,10 +2579,10 @@ func TestEngine_DisabledCommands(t *testing.T) {
 
 func TestEngine_DisabledCommandsWithSlash(t *testing.T) {
 	e := newTestEngine()
-	e.SetDisabledCommands([]string{"/upgrade"})
+	e.SetDisabledCommands([]string{"/shell"})
 
-	if !e.disabledCmds["upgrade"] {
-		t.Error("upgrade should be disabled even when prefixed with /")
+	if !e.disabledCmds["shell"] {
+		t.Error("shell should be disabled even when prefixed with /")
 	}
 }
 
@@ -2596,9 +2596,9 @@ func TestResolveDisabledCmds_Wildcard(t *testing.T) {
 }
 
 func TestResolveDisabledCmds_Specific(t *testing.T) {
-	m := resolveDisabledCmds([]string{"upgrade", "/restart", "Help"})
-	if !m["upgrade"] {
-		t.Error("upgrade should be disabled")
+	m := resolveDisabledCmds([]string{"dir", "/restart", "Help"})
+	if !m["dir"] {
+		t.Error("dir should be disabled")
 	}
 	if !m["restart"] {
 		t.Error("restart should be disabled (slash stripped)")
@@ -2702,15 +2702,23 @@ func TestEngine_AdminFrom_GatesRestart(t *testing.T) {
 	}
 }
 
-func TestEngine_AdminFrom_GatesUpgrade(t *testing.T) {
-	e := newTestEngine()
-	p := &stubPlatformEngine{n: "test"}
-
-	msg := &Message{SessionKey: "test:u1", UserID: "user1", ReplyCtx: "ctx"}
-	e.handleCommand(p, msg, "/upgrade")
-
-	if len(p.sent) != 1 || !strings.Contains(p.sent[0], "admin") {
-		t.Errorf("non-admin should be blocked from /upgrade, got: %v", p.sent)
+// Self-update was removed from this fork: it downloaded release assets from
+// upstream's repo, so on a trimmed build it would have replaced the running
+// binary with upstream's full one — re-introducing the agents, platforms and
+// provider referral codes that were deliberately taken out. The chat command,
+// the CLI subcommands and core/updater.go are all gone.
+//
+// Guards the whole removal at its two entry points: alias resolution (so
+// /upgrade and /update no longer resolve to anything) and the privileged-command
+// map (so a re-added entry cannot silently re-gate a command that isn't there).
+func TestEngine_UpgradeCommandRemoved(t *testing.T) {
+	for _, name := range []string{"upgrade", "update"} {
+		if id := matchPrefix(name, builtinCommands); id != "" {
+			t.Errorf("/%s still resolves to command %q; self-update was removed from this fork", name, id)
+		}
+	}
+	if privilegedCommands["upgrade"] {
+		t.Error(`privilegedCommands still contains "upgrade"; the command no longer exists`)
 	}
 }
 

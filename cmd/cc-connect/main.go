@@ -206,13 +206,7 @@ var topLevelCommandHandlers = map[string]func([]string){
 	"config-example": func(_ []string) {
 		fmt.Print(ccconnect.ConfigExampleTOML)
 	},
-	"config": runConfig,
-	"update": func(_ []string) {
-		runUpdate()
-	},
-	"check-update": func(_ []string) {
-		checkUpdate()
-	},
+	"config":    runConfig,
 	"provider":  runProviderCommand,
 	"send":      runSend,
 	"cron":      runCron,
@@ -229,7 +223,6 @@ var topLevelCommandHandlers = map[string]func([]string){
 }
 
 func main() {
-	checkUpdateAsync()
 	// When started as a daemon (CC_LOG_FILE set), redirect logs to a rotating file.
 	// Log file setup happens before flag.Parse() so the rotating writer is in
 	// place before any slog output. To still honour --log-max-size, we
@@ -1356,14 +1349,6 @@ func main() {
 			slog.Error("restart: cannot determine executable path", "error", err)
 			os.Exit(1)
 		}
-		// After self-update, os.Executable() may return the .old path on Linux.
-		// Strip the .old suffix to restart from the updated binary.
-		if strings.HasSuffix(execPath, ".old") {
-			newPath := strings.TrimSuffix(execPath, ".old")
-			if _, err := os.Stat(newPath); err == nil {
-				execPath = newPath
-			}
-		}
 		slog.Info("restarting...", "path", execPath, "args", os.Args)
 		if err := restartProcess(execPath); err != nil {
 			slog.Error("restart: failed", "error", err)
@@ -1591,15 +1576,12 @@ func printUsage() {
 		v = "dev"
 	}
 
-	// 检查是否有新版本可用并显示提示
-	updateHint := getUpdateHintIfAvailable()
-
 	fmt.Fprintf(os.Stderr, `
                                               _
   ___ ___        ___ ___  _ __  _ __   ___  ___| |_
  / __/ __|_____ / __/ _ \| '_ \| '_ \ / _ \/ __| __|
 | (_| (_|_____|  (_| (_) | | | | | | |  __/ (__| |_
- \___\__|      \___\___/|_| |_|_| |_|\___|\___|\__|  %s%s
+ \___\__|      \___\___/|_| |_|_| |_|\___|\___|\__|  %s
 
   Bridge your messaging platforms to local AI coding agents.
   Supports: Claude Code, Codex, Cursor, Gemini CLI, Qoder CLI, OpenCode
@@ -1669,8 +1651,6 @@ Commands:
     format           Format the config file (alias: fmt)
     path             Print the resolved config file path
 
-  update             Check for updates and upgrade the binary (--pre for beta)
-  check-update       Check if a newer version is available
   config-example     (deprecated: use 'config example' instead)
 
 Examples:
@@ -1682,11 +1662,10 @@ Examples:
   cc-connect cron list                List all scheduled tasks
   cc-connect feishu setup             Setup Feishu/Lark bot credentials
   cc-connect weixin setup             Setup Weixin (ilink) with QR or --token
-  cc-connect update                   Update to the latest version
   cc-connect config format            Format the config file
   cc-connect config example > c.toml  Save example config to a file
 
-`, v, updateHint)
+`, v)
 }
 
 func setupLogger(level string, w io.Writer) {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Slash, Search, MessageSquarePlus, List, ArrowRightLeft, Eye, History,
   Square, Brain, Cpu, Languages, Layers, Activity, Stethoscope, Info,
-  Settings, Timer, HeartPulse, Terminal, Tag, Wrench, Upload, Trash2,
+  Settings, Timer, HeartPulse, Terminal, Tag, Wrench, Trash2,
   FolderOpen, HelpCircle, User, BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -44,7 +44,6 @@ export const slashCommands: SlashCommand[] = [
   { cmd: '/alias', labelKey: 'cmd.alias', icon: Tag, group: 'advanced' },
   { cmd: '/config', labelKey: 'cmd.config', icon: Settings, group: 'advanced' },
   { cmd: '/skills', labelKey: 'cmd.skills', icon: BookOpen, group: 'advanced' },
-  { cmd: '/upgrade', labelKey: 'cmd.upgrade', icon: Upload, group: 'advanced' },
   { cmd: '/delete-mode', labelKey: 'cmd.deleteMode', icon: Trash2, group: 'advanced' },
 ];
 
